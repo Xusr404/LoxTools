@@ -10,6 +10,7 @@ $ErrorActionPreference = "Stop"
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $projectPath = Join-Path $repoRoot "LoxTools\LoxTools.csproj"
 $publishDir = Join-Path $repoRoot "artifacts\installer-input"
+$supportedSatelliteCultures = @("de", "de-DE")
 
 if (-not (Test-Path $projectPath)) {
     throw "Project file not found: $projectPath"
@@ -68,6 +69,9 @@ New-Item -ItemType Directory -Force -Path $publishDir | Out-Null
     /p:SelfContained=true `
     /p:PublishDir="$publishDir\" `
     /p:PublishSingleFile=false `
+    /p:DebugType=None `
+    /p:DebugSymbols=false `
+    /p:SatelliteResourceLanguages=de%3Bde-DE `
     /p:Version=$AppVersion
 
 if ($LASTEXITCODE -ne 0) {
@@ -77,6 +81,49 @@ if ($LASTEXITCODE -ne 0) {
 $publishedExe = Join-Path $publishDir "LoxTools.exe"
 if (-not (Test-Path $publishedExe)) {
     throw "Expected application was not published: $publishedExe"
+}
+
+$publishedPdbFiles = @(Get-ChildItem -LiteralPath $publishDir -Filter "*.pdb" -File -Recurse)
+if ($publishedPdbFiles.Count -gt 0) {
+    $relativePaths = $publishedPdbFiles |
+        ForEach-Object { [System.IO.Path]::GetRelativePath($publishDir, $_.FullName) }
+    throw "Publish output contains debug symbols: $($relativePaths -join ', ')"
+}
+
+$publishedAppConfig = Join-Path $publishDir "LoxTools.dll.config"
+if (Test-Path $publishedAppConfig) {
+    throw "Publish output contains the obsolete application config: $publishedAppConfig"
+}
+
+$cultureDirectories = @(
+    Get-ChildItem -LiteralPath $publishDir -Directory | Where-Object {
+        try {
+            [void][System.Globalization.CultureInfo]::GetCultureInfo($_.Name)
+            return $true
+        } catch [System.Globalization.CultureNotFoundException] {
+            return $false
+        }
+    }
+)
+
+$unexpectedCultureDirectories = @(
+    $cultureDirectories | Where-Object { $_.Name -notin $supportedSatelliteCultures }
+)
+if ($unexpectedCultureDirectories.Count -gt 0) {
+    $unexpectedCultures = $unexpectedCultureDirectories.Name | Sort-Object
+    throw "Publish output contains unsupported satellite cultures: $($unexpectedCultures -join ', ')"
+}
+
+foreach ($requiredCulture in $supportedSatelliteCultures) {
+    $culturePath = Join-Path $publishDir $requiredCulture
+    if (-not (Test-Path -LiteralPath $culturePath -PathType Container)) {
+        throw "Publish output is missing the required satellite culture '$requiredCulture': $culturePath"
+    }
+}
+
+$germanApplicationResources = Join-Path $publishDir "de-DE\LoxTools.resources.dll"
+if (-not (Test-Path -LiteralPath $germanApplicationResources -PathType Leaf)) {
+    throw "Publish output is missing the German application resources: $germanApplicationResources"
 }
 
 Write-Host "Application published: $publishDir"
