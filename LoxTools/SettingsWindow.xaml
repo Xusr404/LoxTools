@@ -1,0 +1,629 @@
+<Window x:Class="LoxTools.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        xmlns:ui="clr-namespace:LoxTools.UI.Converters"
+        mc:Ignorable="d"
+        Title="{Binding LangSettings}"
+        Width="980"
+        Height="680"
+        MinWidth="860"
+        MinHeight="560"
+        WindowStartupLocation="CenterOwner"
+        Background="#0E1113"
+        FontFamily="Segoe UI"
+        Foreground="#E6E6E6">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Themes/AppTheme.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <DataTemplate x:Key="PathItemTemplate">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="{Binding}"
+                               TextTrimming="CharacterEllipsis"
+                               VerticalAlignment="Center"
+                               ToolTip="{Binding}"/>
+
+                    <Button Grid.Column="1"
+                            Style="{StaticResource PathDeleteButtonStyle}"
+                            Click="RemovePath_Click"
+                            ToolTip="{Binding DataContext.LangDelete, RelativeSource={RelativeSource AncestorType=Window}}"
+                            AutomationProperties.Name="{Binding DataContext.LangDelete, RelativeSource={RelativeSource AncestorType=Window}}">
+                        <Viewbox Width="{StaticResource PathDeleteIconSize}"
+                                 Height="{StaticResource PathDeleteIconSize}">
+                            <Path Data="{StaticResource TrashGeometry}"
+                                  Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                        </Viewbox>
+                    </Button>
+                </Grid>
+            </DataTemplate>
+        </ResourceDictionary>
+    </Window.Resources>
+
+
+
+    <!-- Root named for binding -->
+    <Grid x:Name="Root">
+
+        <!-- Page container:
+             - Width follows available space (so it doesn't become "too narrow" on small windows)
+             - MaxWidth clamps at 1080
+             - stays centered -->
+        <Border Width="{Binding ElementName=Root, Path=ActualWidth}"
+                MaxWidth="1080"
+                HorizontalAlignment="Center"
+                Padding="22">
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <!-- Title -->
+                    <RowDefinition Height="163*"/>
+                    <RowDefinition Height="356*"/>
+                    <!-- Content -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- Footer -->
+                </Grid.RowDefinitions>
+
+                <!-- Title (standalone) -->
+                <TextBlock Grid.Row="0"
+                           Text="{Binding LangSettings}"
+                           FontSize="{StaticResource FsTitle}"
+                           FontWeight="SemiBold"
+                           Foreground="{StaticResource BrushPrimary}"
+                           Margin="2,0,0,14"/>
+
+                <!-- Scroll content -->
+                <ScrollViewer x:Name="Scroll"
+              VerticalScrollBarVisibility="Auto"
+              HorizontalScrollBarVisibility="Disabled"
+              Margin="0,43,0,0"
+              Grid.RowSpan="3">
+
+                    <ScrollViewer.Resources>
+                        <Style TargetType="{x:Type ScrollBar}" BasedOn="{StaticResource ModernScrollBarStyle}"/>
+                    </ScrollViewer.Resources>
+
+                    <!-- IMPORTANT:
+                         - no MaxWidth here (handled by outer container)
+                         - Stretch so content uses full available width -->
+                    <Border HorizontalAlignment="Stretch">
+                        <StackPanel Margin="0,0,0,8"
+                                    HorizontalAlignment="Stretch">
+
+                            <!-- SECTION: Allgemein -->
+                            <Border Style="{StaticResource CardStyle}" Margin="0,0,0,14">
+                                <StackPanel>
+                                    <StackPanel Margin="0,0,0,14">
+                                        <TextBlock Text="{Binding LangSectionGeneral}"
+                                                   FontSize="{StaticResource FsSection}"
+                                                   FontWeight="SemiBold"/>
+                                    </StackPanel>
+
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                                            <TextBlock Text="{Binding LangWindowsAutostartup}"
+                                                       FontSize="{StaticResource FsLabel}"/>
+                                            <TextBlock Text="{Binding LangRunAtWindowsStartup}"
+                                                       FontSize="{StaticResource FsSecondary}"
+                                                       Foreground="{StaticResource BrushSecondary}"
+                                                       Margin="0,2,0,0"/>
+                                        </StackPanel>
+
+                                        <ToggleButton Grid.Column="1"
+                                                      Style="{StaticResource SwitchStyle}"
+                                                      IsChecked="{Binding Autostartup}"/>
+                                    </Grid>
+
+                                    <Separator Margin="0,14" Opacity="0.22"/>
+
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                                            <TextBlock Text="{Binding LangAlwaysShowVersionDialog}"
+                                                       FontSize="{StaticResource FsLabel}"/>
+                                            <TextBlock Text="{Binding LangAlwaysShowDialogHint}"
+                                                       FontSize="{StaticResource FsSecondary}"
+                                                       Foreground="{StaticResource BrushSecondary}"
+                                                       Margin="0,2,0,0"/>
+                                        </StackPanel>
+
+                                        <ToggleButton Grid.Column="1"
+                                                      Style="{StaticResource SwitchStyle}"
+                                                      IsChecked="{Binding AlwaysShowSelectionDialog}"/>
+                                    </Grid>
+
+                                    <Separator Margin="0,14" Opacity="0.22"/>
+
+                                    <StackPanel Margin="0,2,0,0">
+                                        <TextBlock Text="{Binding LaunchModeTitle}"
+                                                   FontSize="{StaticResource FsSection}"
+                                                   FontWeight="SemiBold"
+                                                   Margin="0,0,0,2"/>
+                                        <TextBlock Text="{Binding LaunchModeHint}"
+                                                   FontSize="{StaticResource FsSecondary}"
+                                                   Foreground="{StaticResource BrushSecondary}"
+                                                   Margin="0,0,0,10"/>
+                                        <RadioButton Style="{StaticResource DarkRadioButtonStyle}"
+                                                     GroupName="VersionModeSettings"
+                                                     IsChecked="{Binding UseLatestVersion, Mode=TwoWay}"
+                                                     Margin="0,0,0,6">
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding UseLatestVersionOptionTitle}"
+                                                           FontSize="{StaticResource FsLabel}"/>
+                                                <TextBlock Text="{Binding UseLatestVersionOptionHint}"
+                                                           FontSize="{StaticResource FsSecondary}"
+                                                           Foreground="{StaticResource BrushSecondary}"
+                                                           Margin="0,3,0,0"/>
+                                                <TextBlock FontSize="{StaticResource FsSecondary}"
+                                                           Foreground="{StaticResource BrushSecondary}"
+                                                           Margin="0,3,0,0">
+                                                    <Run Text="{Binding LatestVersionLabel, Mode=OneWay}"/>
+                                                    <Run Text=" "/>
+                                                    <Run Text="{Binding LatestVersionValue, Mode=OneWay}"
+                                                         Foreground="{StaticResource BrushAccent}"
+                                                         FontWeight="SemiBold"/>
+                                                </TextBlock>
+                                            </StackPanel>
+                                        </RadioButton>
+
+                                        <RadioButton Style="{StaticResource DarkRadioButtonStyle}"
+                                                     GroupName="VersionModeSettings"
+                                                     IsChecked="{Binding UseFixedVersion, Mode=TwoWay}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                                                    <TextBlock Text="{Binding UseFixedVersionOptionTitle}"
+                                                               FontSize="{StaticResource FsLabel}"/>
+                                                    <TextBlock Text="{Binding UseFixedVersionOptionHint}"
+                                                               FontSize="{StaticResource FsSecondary}"
+                                                               Foreground="{StaticResource BrushSecondary}"
+                                                               Margin="0,3,0,0"/>
+                                                </StackPanel>
+                                                <ComboBox Grid.Column="1"
+                                                          ItemsSource="{Binding InstalledVersions}"
+                                                          SelectedItem="{Binding SelectedFixedVersion, Mode=TwoWay}"
+                                                          DisplayMemberPath="DisplayName"
+                                                          MinWidth="240"
+                                                          MaxWidth="360"
+                                                          HorizontalAlignment="Right"
+                                                          IsEnabled="{Binding UseFixedVersion}"
+                                                          Style="{StaticResource AppComboBoxStyle}"/>
+                                            </Grid>
+                                        </RadioButton>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- SECTION: Dateizuordnung -->
+                            <Border Style="{StaticResource CardStyle}" Margin="0,0,0,14">
+                                <StackPanel>
+                                    <Grid Margin="0,0,0,14">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <Grid Grid.Row="1">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
+                                            <TextBlock Text="{Binding FileAssociationDescription}"
+                                                       FontSize="{StaticResource FsSecondary}"
+                                                       Foreground="{StaticResource BrushSecondary}"
+                                                       Margin="0,2,0,0"
+                                                       Grid.Column="0"
+                                                       Grid.Row="0"/>
+                                            <TextBlock FontSize="{StaticResource FsSecondary}"
+                                                       Foreground="{StaticResource BrushSecondary}"
+                                                       Margin="0,6,0,0"
+                                                       TextTrimming="CharacterEllipsis"
+                                                       ToolTip="{Binding FileAssociationStatus}"
+                                                       Grid.Column="0"
+                                                       Grid.Row="1">
+                                                <Run Text="{Binding FileAssociationStatusLabel, Mode=OneWay}"/>
+                                                <Run Text=" "/>
+                                                <Run Text="{Binding FileAssociationStatusValue, Mode=OneWay}"
+                                                     FontWeight="SemiBold">
+                                                    <Run.Style>
+                                                        <Style TargetType="Run">
+                                                            <Setter Property="Foreground" Value="{DynamicResource BrushSecondary}"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsFileAssociationMixed}" Value="True">
+                                                                    <Setter Property="Foreground" Value="{DynamicResource BrushWarning}"/>
+                                                                </DataTrigger>
+                                                                <MultiDataTrigger>
+                                                                    <MultiDataTrigger.Conditions>
+                                                                        <Condition Binding="{Binding IsFileAssociationCurrent}" Value="True"/>
+                                                                        <Condition Binding="{Binding IsFileAssociationMixed}" Value="False"/>
+                                                                    </MultiDataTrigger.Conditions>
+                                                                    <Setter Property="Foreground" Value="{DynamicResource BrushAccent}"/>
+                                                                </MultiDataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Run.Style>
+                                                </Run>
+                                            </TextBlock>
+                                            <Button Grid.Column="1"
+                                                    Grid.RowSpan="2"
+                                                    Content="{Binding FileAssociationOpenWindowsButton}"
+                                                    Click="OpenDefaultApps_Click"
+                                                    HorizontalAlignment="Right"
+                                                    VerticalAlignment="Center">
+                                                <Button.Style>
+                                                    <Style TargetType="Button" BasedOn="{StaticResource WarningButtonStyle}">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsFileAssociationCurrent}" Value="False">
+                                                                <Setter Property="Visibility" Value="Visible"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Button.Style>
+                                            </Button>
+                                            <Button Grid.Column="1"
+                                                    Grid.RowSpan="2"
+                                                    Content="{Binding FileAssociationOpenWindowsButton}"
+                                                    Click="OpenDefaultApps_Click"
+                                                    HorizontalAlignment="Right"
+                                                    VerticalAlignment="Center">
+                                                <Button.Style>
+                                                    <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsFileAssociationCurrent}" Value="True">
+                                                                <Setter Property="Visibility" Value="Visible"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Button.Style>
+                                            </Button>
+                                        </Grid>
+                                        <TextBlock Text="{Binding FileAssociationTitle}"
+                                                   FontSize="{StaticResource FsSection}"
+                                                   FontWeight="SemiBold"
+                                                   Grid.Row="0"/>
+                                    </Grid>
+
+                                </StackPanel>
+                            </Border>
+
+                            <!-- SECTION: Pfade -->
+                            <Border Style="{StaticResource CardStyle}" Margin="0,0,0,14">
+                                <StackPanel>
+                                    <StackPanel Margin="0,0,0,14">
+                                        <TextBlock Text="{Binding LangSectionPaths}"
+                                                   FontSize="{StaticResource FsSection}"
+                                                   FontWeight="SemiBold"/>
+                                    </StackPanel>
+
+                                    <!-- Installation paths -->
+                                    <Grid Margin="0,0,0,14">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="{Binding LangInstallationpaths}"
+                                                       FontSize="{StaticResource FsLabel}"/>
+                                            <TextBlock Text="{Binding LangConfigDirectoryPaths}"
+                                                       FontSize="{StaticResource FsSecondary}"
+                                                       Foreground="{StaticResource BrushSecondary}"
+                                                       Margin="0,2,0,0"/>
+                                        </StackPanel>
+
+                                        <StackPanel Grid.Column="1"
+                                                    Orientation="Horizontal"
+                                                    HorizontalAlignment="Right"
+                                                    Margin="10,0,0,0">
+                                            <Button Content="{Binding LangBrowse}" Click="BrowseConfig_Click"/>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <Border Margin="0,10,0,0"
+                                            CornerRadius="10"
+                                            Background="#33FFB347"
+                                            BorderBrush="#66FFB347"
+                                            BorderThickness="1"
+                                            Padding="12">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ConfigPaths.Count}" Value="0">
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Viewbox Width="18" Height="18" Margin="0,2,10,0">
+                                                <Path Fill="#FFD27D2D"
+                                                      Data="M12 2L1 22h22L12 2zm0 6c.6 0 1 .4 1 1v5c0 .6-.4 1-1 1s-1-.4-1-1V9c0-.6.4-1 1-1zm0 10a1.5 1.5 0 1 1 0-3a1.5 1.5 0 0 1 0 3z"/>
+                                            </Viewbox>
+                                            <StackPanel Grid.Column="1">
+                                                <TextBlock Text="{Binding LangNoInstallationPathTitle}"
+                                                           FontSize="{StaticResource FsLabel}"
+                                                           FontWeight="SemiBold"/>
+                                                <TextBlock Text="{Binding LangNoInstallationPathDescription}"
+                                                           FontSize="{StaticResource FsSecondary}"
+                                                           Foreground="{StaticResource BrushSecondary}"
+                                                           Margin="0,2,0,0"/>
+                                                <TextBlock FontSize="{StaticResource FsSecondary}"
+                                                           Foreground="{StaticResource BrushSecondary}"
+                                                           Margin="0,4,0,0">
+                                                    <Run Text="{Binding DefaultConfigPathLabel, Mode=OneWay}"/>
+                                                    <Run Text=" "/>
+                                                    <Run Text="{Binding DefaultConfigPathValue, Mode=OneWay}"
+                                                         Foreground="{StaticResource BrushAccent}"
+                                                         FontWeight="SemiBold"/>
+                                                </TextBlock>
+                                            </StackPanel>
+                                            <StackPanel Grid.Column="2"
+                                                        Orientation="Vertical"
+                                                        HorizontalAlignment="Right"
+                                                        VerticalAlignment="Center"
+                                                        Margin="10,0,0,0">
+                                                <Button Content="{Binding LangNoInstallationPathUseSuggestedButton}"
+                                                        Click="UseSuggestedConfigPath_Click"
+                                                        IsEnabled="{Binding CanUseSuggestedConfigPath}"
+                                                        HorizontalAlignment="Right"/>
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
+
+                                    <ListBox ItemsSource="{Binding ConfigPaths}"
+                                             SelectedItem="{Binding SelectedConfigPath}"
+                                             KeyDown="ConfigPaths_KeyDown"
+                                             PreviewMouseWheel="ListBox_PreviewMouseWheel"
+                                             ItemTemplate="{StaticResource PathItemTemplate}">
+                                        <ListBox.Style>
+                                            <Style TargetType="ListBox" BasedOn="{StaticResource {x:Type ListBox}}">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ConfigPaths.Count}" Value="0">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </ListBox.Style>
+                                    </ListBox>
+
+                                    <TextBlock Text="{Binding ConfigMessage}"
+                                               FontSize="{StaticResource FsSecondary}"
+                                               Foreground="{StaticResource BrushSecondary}"
+                                               Margin="0,8,0,0"
+                                               Visibility="{Binding ConfigMessageVisibility}"/>
+
+                                    <Separator Margin="0,14" Opacity="0.22"/>
+
+                                    <!-- Project paths -->
+                                    <Grid Margin="0,0,0,14">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="{Binding LangProjectDirectorypaths}"
+                                                       FontSize="{StaticResource FsLabel}"/>
+                                            <TextBlock Text="{Binding LangProjectFoldersHint}"
+                                                       FontSize="{StaticResource FsSecondary}"
+                                                       Foreground="{StaticResource BrushSecondary}"
+                                                       Margin="0,2,0,0"/>
+                                        </StackPanel>
+
+                                        <StackPanel Grid.Column="1"
+                                                    Orientation="Horizontal"
+                                                    HorizontalAlignment="Right"
+                                                    Margin="10,0,0,0">
+                                            <Button Content="{Binding LangBrowse}" Click="BrowseProjects_Click"/>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <Border Margin="0,10,0,0"
+                                            CornerRadius="10"
+                                            Background="#33FFB347"
+                                            BorderBrush="#66FFB347"
+                                            BorderThickness="1"
+                                            Padding="12">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ProjectPaths.Count}" Value="0">
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Viewbox Width="18" Height="18" Margin="0,2,10,0">
+                                                <Path Fill="#FFD27D2D"
+                                                      Data="M12 2L1 22h22L12 2zm0 6c.6 0 1 .4 1 1v5c0 .6-.4 1-1 1s-1-.4-1-1V9c0-.6.4-1 1-1zm0 10a1.5 1.5 0 1 1 0-3a1.5 1.5 0 0 1 0 3z"/>
+                                            </Viewbox>
+                                            <StackPanel Grid.Column="1">
+                                                <TextBlock Text="{Binding LangNoProjectPathTitle}"
+                                                           FontSize="{StaticResource FsLabel}"
+                                                           FontWeight="SemiBold"/>
+                                                <TextBlock Text="{Binding LangNoProjectPathDescription}"
+                                                           FontSize="{StaticResource FsSecondary}"
+                                                           Foreground="{StaticResource BrushSecondary}"
+                                                           Margin="0,2,0,0"/>
+                                                <TextBlock FontSize="{StaticResource FsSecondary}"
+                                                           Foreground="{StaticResource BrushSecondary}"
+                                                           Margin="0,4,0,0">
+                                                    <Run Text="{Binding DefaultProjectPathLabel, Mode=OneWay}"/>
+                                                    <Run Text=" "/>
+                                                    <Run Text="{Binding DefaultProjectPathValue, Mode=OneWay}"
+                                                         Foreground="{StaticResource BrushAccent}"
+                                                         FontWeight="SemiBold"/>
+                                                </TextBlock>
+                                            </StackPanel>
+                                            <StackPanel Grid.Column="2"
+                                                        Orientation="Vertical"
+                                                        HorizontalAlignment="Right"
+                                                        VerticalAlignment="Center"
+                                                        Margin="10,0,0,0">
+                                                <Button Content="{Binding LangNoProjectPathUseSuggestedButton}"
+                                                        Click="UseSuggestedProjectPath_Click"
+                                                        IsEnabled="{Binding CanUseSuggestedProjectPath}"
+                                                        HorizontalAlignment="Right"/>
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
+
+                                    <ListBox ItemsSource="{Binding ProjectPaths}"
+                                             SelectedItem="{Binding SelectedProjectPath}"
+                                             KeyDown="ProjectPaths_KeyDown"
+                                             PreviewMouseWheel="ListBox_PreviewMouseWheel"
+                                             ItemTemplate="{StaticResource PathItemTemplate}">
+                                        <ListBox.Style>
+                                            <Style TargetType="ListBox" BasedOn="{StaticResource {x:Type ListBox}}">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ProjectPaths.Count}" Value="0">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </ListBox.Style>
+                                    </ListBox>
+
+                                    <TextBlock Text="{Binding ProjectsMessage}"
+                                               FontSize="{StaticResource FsSecondary}"
+                                               Foreground="{StaticResource BrushSecondary}"
+                                               Margin="0,8,0,0"
+                                               Visibility="{Binding ProjectsMessageVisibility}"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- SECTION: Erweitert -->
+                            <Border Style="{StaticResource CardStyle}">
+                                <StackPanel>
+                                    <StackPanel Margin="0,0,0,14">
+                                        <TextBlock Text="{Binding LangSectionAdvanced}"
+                                                   FontSize="{StaticResource FsSection}"
+                                                   FontWeight="SemiBold"/>
+                                    </StackPanel>
+
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                                            <TextBlock Text="{Binding LangMiddleMousePressing}"
+                                                       FontSize="{StaticResource FsLabel}"/>
+                                            <TextBlock Text="{Binding LangCloseAllOpenConfig}"
+                                                       FontSize="{StaticResource FsSecondary}"
+                                                       Foreground="{StaticResource BrushSecondary}"
+                                                       Margin="0,2,0,0"/>
+                                        </StackPanel>
+
+                                        <ToggleButton Grid.Column="1"
+                                                      Style="{StaticResource SwitchStyle}"
+                                                      IsChecked="{Binding MiddleMouseButtonEvent}"/>
+                                    </Grid>
+
+                                    <Separator Margin="0,14" Opacity="0.22"/>
+
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                                            <TextBlock Text="{Binding LangUpdateChannelTitle}"
+                                                       FontSize="{StaticResource FsLabel}"/>
+                                            <TextBlock Text="{Binding LangUpdateChannelHint}"
+                                                       FontSize="{StaticResource FsSecondary}"
+                                                       Foreground="{StaticResource BrushSecondary}"
+                                                       Margin="0,2,0,0"/>
+                                        </StackPanel>
+
+                                        <ComboBox Grid.Column="1"
+                                                  ItemsSource="{Binding UpdateChannels}"
+                                                  SelectedValue="{Binding SelectedUpdateChannel, Mode=TwoWay}"
+                                                  SelectedValuePath="Value"
+                                                  DisplayMemberPath="DisplayName"
+                                                  MinWidth="180"
+                                                  HorizontalAlignment="Right"
+                                                  Style="{StaticResource AppComboBoxStyle}"/>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+
+                        </StackPanel>
+                    </Border>
+                </ScrollViewer>
+
+                <!-- Footer: buttons directly on background -->
+                <Grid Grid.Row="3" Margin="0,14,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Column="0"
+                               Text="{Binding ApplicationVersionDisplay}"
+                               FontSize="{StaticResource FsSecondary}"
+                               Foreground="{StaticResource BrushSecondary}"
+                               HorizontalAlignment="Left"
+                               VerticalAlignment="Bottom"/>
+
+                    <StackPanel Grid.Column="1"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Bottom">
+                        <Button Style="{StaticResource FooterDeleteButtonStyle}"
+                                Content="{Binding LangCancel}"
+                                Click="Cancel_Click"
+                                Margin="0,0,12,0"/>
+                        <Button Style="{StaticResource FooterAccentButtonStyle}"
+                                Content="{Binding LangSave}"
+                                Click="Save_Click"/>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

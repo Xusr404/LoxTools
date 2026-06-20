@@ -1,0 +1,405 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Abort" xml:space="preserve">
+    <value>Abbrechen</value>
+  </data>
+  <data name="Activate" xml:space="preserve">
+    <value>aktivieren</value>
+  </data>
+  <data name="AlwaysShowVersionDialog" xml:space="preserve">
+    <value>Versionsauswahldialog immer anzeigen</value>
+  </data>
+  <data name="ApplicationVersionFormat" xml:space="preserve">
+    <value>Version {0}</value>
+  </data>
+  <data name="Browse" xml:space="preserve">
+    <value>Pfad hinzufügen...</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Abbrechen</value>
+  </data>
+  <data name="ConfigDirectoryPaths" xml:space="preserve">
+    <value>Config-Verzeichnispfade</value>
+  </data>
+  <data name="CloseAllConfigs" xml:space="preserve">
+    <value>Alle offenen Configs schließen</value>
+  </data>
+  <data name="TerminateAllLoxoneConfigInstances_Title" xml:space="preserve">
+    <value>Laufende Loxone-Config-Instanzen beenden</value>
+  </data>
+  <data name="CloseApplications" xml:space="preserve">
+    <value>Anwendung schließen</value>
+  </data>
+  <data name="Deactivate" xml:space="preserve">
+    <value>deaktivieren</value>
+  </data>
+  <data name="DefaultSelected_Label" xml:space="preserve">
+    <value>Als Standard ausgewählt</value>
+  </data>
+  <data name="SelectAsDefault_Button" xml:space="preserve">
+    <value>Als Standard wählen</value>
+  </data>
+  <data name="DefaultVersion_FootnoteText" xml:space="preserve">
+    <value>Diese Version wird standardmäßig verwendet, wenn Dateien über das Tool geöffnet werden.</value>
+  </data>
+  <data name="Footnote_Asterisk" xml:space="preserve">
+    <value>*</value>
+  </data>
+  <data name="defaultVersion" xml:space="preserve">
+    <value>Standard Version</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Entfernen</value>
+  </data>
+  <data name="Installationpaths" xml:space="preserve">
+    <value>Installationpfad(e)</value>
+  </data>
+  <data name="InitialSetup_DefaultPathMissing" xml:space="preserve">
+    <value>InitialSetup: Standardpfad nicht gefunden: {0}</value>
+  </data>
+  <data name="InitialSetup_ReadRegisteredAppsFailed" xml:space="preserve">
+    <value>InitialSetup: RegisteredApplications konnte nicht gelesen werden: {0}</value>
+  </data>
+  <data name="InitialSetup_RegisterCapabilitiesFailed" xml:space="preserve">
+    <value>InitialSetup: App-Capabilities konnten nicht registriert werden: {0}</value>
+  </data>
+  <data name="NoInstallationPath_Title" xml:space="preserve">
+    <value>Kein Installationspfad hinterlegt</value>
+  </data>
+  <data name="NoInstallationPath_Description" xml:space="preserve">
+    <value>Füge mindestens einen Installationspfad hinzu, damit Loxone Config gefunden wird.</value>
+  </data>
+  <data name="NoInstallationPath_UseSuggestedButton" xml:space="preserve">
+    <value>Vorgeschlagenen Pfad verwenden</value>
+  </data>
+  <data name="InstalledVersions" xml:space="preserve">
+    <value>Installierte Versionen</value>
+  </data>
+  <data name="NoInstalledConfigVersionsFound" xml:space="preserve">
+    <value>Es wurden keine installierten Loxone Config-Versionen gefunden!</value>
+  </data>
+  <data name="TerminateAllLoxoneConfigInstances_Description" xml:space="preserve">
+    <value>Ein Mittelklick auf das Tray-Icon beendet alle laufenden Loxone-Config-Instanzen.</value>
+  </data>
+  <data name="OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="OpenLxApp" xml:space="preserve">
+    <value>Loxone App öffnen</value>
+  </data>
+  <data name="ProjectFolder" xml:space="preserve">
+    <value>Projekt Ordner</value>
+  </data>
+  <data name="PathAlreadyExists" xml:space="preserve">
+    <value>Pfad existiert bereits</value>
+  </data>
+  <data name="PressingMiddleMouseButton" xml:space="preserve">
+    <value>Drücken der mittleren Maustaste</value>
+  </data>
+  <data name="ProjectDirectorypaths" xml:space="preserve">
+    <value>Projekt Speicherpfad(e)</value>
+  </data>
+  <data name="SettingsSectionAdvanced" xml:space="preserve">
+    <value>Erweitert</value>
+  </data>
+  <data name="SettingsSectionGeneral" xml:space="preserve">
+    <value>Allgemein</value>
+  </data>
+  <data name="SettingsSectionPaths" xml:space="preserve">
+    <value>Pfade</value>
+  </data>
+  <data name="Settings_FileAssociation_Title" xml:space="preserve">
+    <value>Dateizuordnung</value>
+  </data>
+  <data name="Settings_FileAssociation_Description" xml:space="preserve">
+    <value>Du kannst LoxTools zum Öffnen von Loxone-Dateien verwenden.</value>
+  </data>
+  <data name="Settings_FileAssociation_Current" xml:space="preserve">
+    <value>Aktuell:</value>
+  </data>
+  <data name="Settings_FileAssociation_Mixed" xml:space="preserve">
+    <value>Unterschiedlich</value>
+  </data>
+  <data name="Settings_FileAssociation_NotSet" xml:space="preserve">
+    <value>Nicht festgelegt</value>
+  </data>
+  <data name="Settings_FileAssociation_OpenWindowsButton" xml:space="preserve">
+    <value>Zuordnung ändern</value>
+  </data>
+  <data name="SettingsAlwaysShowDialogHint" xml:space="preserve">
+    <value>Dialog bei Start immer anzeigen</value>
+  </data>
+  <data name="SettingsProjectFoldersHint" xml:space="preserve">
+    <value>Ordner, in denen Projekte liegen</value>
+  </data>
+  <data name="SettingsUpdateChannelTitle" xml:space="preserve">
+    <value>Update-Kanal</value>
+  </data>
+  <data name="SettingsUpdateChannelHint" xml:space="preserve">
+    <value>Waehle, welcher Update-Kanal geprueft und zum Download angeboten werden soll.</value>
+  </data>
+  <data name="SettingsUpdateChannel_Release" xml:space="preserve">
+    <value>Release</value>
+  </data>
+  <data name="SettingsUpdateChannel_Beta" xml:space="preserve">
+    <value>Beta</value>
+  </data>
+  <data name="SettingsUpdateChannel_Alpha" xml:space="preserve">
+    <value>Alpha</value>
+  </data>
+  <data name="Projects" xml:space="preserve">
+    <value>Projekte</value>
+  </data>
+  <data name="NoProjectPath_Title" xml:space="preserve">
+    <value>Kein Projektpfad hinterlegt</value>
+  </data>
+  <data name="NoProjectPath_Description" xml:space="preserve">
+    <value>Füge mindestens einen Projektpfad hinzu, damit Loxone-Projekte gefunden werden.</value>
+  </data>
+  <data name="NoProjectPath_UseSuggestedButton" xml:space="preserve">
+    <value>Vorgeschlagenen Pfad verwenden</value>
+  </data>
+  <data name="RunAtWindowsStartup" xml:space="preserve">
+    <value>Starten beim Windowsstart</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Speichern</value>
+  </data>
+  <data name="Start" xml:space="preserve">
+    <value>Starten</value>
+  </data>
+  <data name="SetAsDefaultVersion" xml:space="preserve">
+    <value>Als Standardversion festlegen</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Einstellungen</value>
+  </data>
+  <data name="ShortcutDescription" xml:space="preserve">
+    <value>LoxTools im Startmenü</value>
+  </data>
+  <data name="StartConfigFailed" xml:space="preserve">
+    <value>LoxoneConfig konnte nicht gestartet werden!\nFehler: {0}</value>
+  </data>
+  <data name="LaunchModeTitle" xml:space="preserve">
+    <value>Startmodus</value>
+  </data>
+  <data name="LaunchModeHint" xml:space="preserve">
+    <value>Wähle, ob automatisch die neueste Version oder eine feste Standardversion verwendet wird.</value>
+  </data>
+  <data name="LaunchModeManagedHint" xml:space="preserve">
+    <value>LaunchMode wird in den Einstellungen verwaltet.</value>
+  </data>
+  <data name="FixedVersionSelectLabel" xml:space="preserve">
+    <value>Feste Version</value>
+  </data>
+  <data name="OpenSettingsLabel" xml:space="preserve">
+    <value>Einstellungen öffnen</value>
+  </data>
+  <data name="LatestInstalledVersionLabel" xml:space="preserve">
+    <value>Aktuellste installierte Version:</value>
+  </data>
+  <data name="UseLatestVersionOptionTitle" xml:space="preserve">
+    <value>Immer neueste Version verwenden (empfohlen)</value>
+  </data>
+  <data name="UseLatestVersionOptionHint" xml:space="preserve">
+    <value>Startet automatisch mit der neuesten installierten Version.</value>
+  </data>
+  <data name="UseFixedVersionOptionTitle" xml:space="preserve">
+    <value>Feste Version verwenden</value>
+  </data>
+  <data name="UseFixedVersionOptionHint" xml:space="preserve">
+    <value>Standardversion manuell auswählen.</value>
+  </data>
+  <data name="UseLatestVersion" xml:space="preserve">
+    <value>Aktuellste Version verwenden</value>
+  </data>
+  <data name="UseLatestVersionHint" xml:space="preserve">
+    <value>Beim Start immer die neueste installierte Version verwenden.</value>
+  </data>
+  <data name="VersionSelectorTitle" xml:space="preserve">
+    <value>VersionSelector</value>
+  </data>
+  <data name="WindowsAutostartup" xml:space="preserve">
+    <value>Windows Autostartup</value>
+  </data>
+  <data name="String1RunAtWindowsStartup" xml:space="preserve">
+    <value>Beim Starten von Windows ausführen</value>
+  </data>
+  <data name="DefaultConfigPathLabel" xml:space="preserve">
+    <value>Vorgeschlagener Standardpfad:</value>
+  </data>
+  <data name="DefaultProjectPathLabel" xml:space="preserve">
+    <value>Vorgeschlagener Standardpfad:</value>
+  </data>
+  <data name="UpdateCheck_Checking" xml:space="preserve">
+    <value>Pruefe .</value>
+  </data>
+  <data name="UpdateCheck_Checking_WithDots" xml:space="preserve">
+    <value>Pruefe{0}</value>
+  </data>
+  <data name="UpdateCheck_Downloading_WithDots" xml:space="preserve">
+    <value>Download{0}</value>
+  </data>
+  <data name="UpdateCheck_UpdateAvailable_Release" xml:space="preserve">
+    <value>Release-Update verfuegbar - Download &amp; installieren</value>
+  </data>
+  <data name="UpdateCheck_UpdateAvailable_Release_WithVersion" xml:space="preserve">
+    <value>Release-Update verfuegbar ({0}) - Download &amp; installieren</value>
+  </data>
+  <data name="UpdateCheck_UpdateAvailable_Beta" xml:space="preserve">
+    <value>Beta-Update verfuegbar - Download &amp; installieren</value>
+  </data>
+  <data name="UpdateCheck_UpdateAvailable_Beta_WithVersion" xml:space="preserve">
+    <value>Beta-Update verfuegbar ({0}) - Download &amp; installieren</value>
+  </data>
+  <data name="UpdateCheck_UpdateAvailable_Alpha" xml:space="preserve">
+    <value>Alpha-Update verfuegbar - Download &amp; installieren</value>
+  </data>
+  <data name="UpdateCheck_UpdateAvailable_Alpha_WithVersion" xml:space="preserve">
+    <value>Alpha-Update verfuegbar ({0}) - Download &amp; installieren</value>
+  </data>
+  <data name="UpdateCheck_UpToDate_Release" xml:space="preserve">
+    <value>Neueste Config-Release installiert</value>
+  </data>
+  <data name="UpdateCheck_UpToDate_Release_WithVersion" xml:space="preserve">
+    <value>Neueste Config-Release installiert ({0})</value>
+  </data>
+  <data name="UpdateCheck_UpToDate_Beta" xml:space="preserve">
+    <value>Neueste Config-Beta installiert</value>
+  </data>
+  <data name="UpdateCheck_UpToDate_Beta_WithVersion" xml:space="preserve">
+    <value>Neueste Config-Beta installiert ({0})</value>
+  </data>
+  <data name="UpdateCheck_UpToDate_Alpha" xml:space="preserve">
+    <value>Neueste Config-Alpha installiert</value>
+  </data>
+  <data name="UpdateCheck_UpToDate_Alpha_WithVersion" xml:space="preserve">
+    <value>Neueste Config-Alpha installiert ({0})</value>
+  </data>
+  <data name="UpdateCheck_NoAlphaAvailable" xml:space="preserve">
+    <value>Kein Alpha-Update verfuegbar</value>
+  </data>
+  <data name="UpdateCheck_Failed" xml:space="preserve">
+    <value>Update-Pruefung fehlgeschlagen</value>
+  </data>
+  <data name="UpdateCheck_CheckAgain" xml:space="preserve">
+    <value>Erneut pruefen</value>
+  </data>
+</root>

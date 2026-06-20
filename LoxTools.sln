@@ -1,0 +1,46 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36121.58 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LoxTools", "LoxTools\LoxTools.csproj", "{BF470ACA-6A47-424F-8BFF-35DD3032BC13}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoxTools.Tests", "LoxTools.Tests\LoxTools.Tests.csproj", "{7DDAD033-9D79-4617-AE72-67790CD409C3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		DeleteRegistryEntries|Any CPU = DeleteRegistryEntries|Any CPU
+		HotFeatures|Any CPU = HotFeatures|Any CPU
+		Release|Any CPU = Release|Any CPU
+		ReleaseVersion|Any CPU = ReleaseVersion|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BF470ACA-6A47-424F-8BFF-35DD3032BC13}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF470ACA-6A47-424F-8BFF-35DD3032BC13}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF470ACA-6A47-424F-8BFF-35DD3032BC13}.DeleteRegistryEntries|Any CPU.ActiveCfg = DeleteRegistryEntries|Any CPU
+		{BF470ACA-6A47-424F-8BFF-35DD3032BC13}.DeleteRegistryEntries|Any CPU.Build.0 = DeleteRegistryEntries|Any CPU
+		{BF470ACA-6A47-424F-8BFF-35DD3032BC13}.HotFeatures|Any CPU.ActiveCfg = HotFeatures|Any CPU
+		{BF470ACA-6A47-424F-8BFF-35DD3032BC13}.HotFeatures|Any CPU.Build.0 = HotFeatures|Any CPU
+		{BF470ACA-6A47-424F-8BFF-35DD3032BC13}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF470ACA-6A47-424F-8BFF-35DD3032BC13}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF470ACA-6A47-424F-8BFF-35DD3032BC13}.ReleaseVersion|Any CPU.ActiveCfg = ReleaseVersion|Any CPU
+		{BF470ACA-6A47-424F-8BFF-35DD3032BC13}.ReleaseVersion|Any CPU.Build.0 = ReleaseVersion|Any CPU
+		{7DDAD033-9D79-4617-AE72-67790CD409C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7DDAD033-9D79-4617-AE72-67790CD409C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7DDAD033-9D79-4617-AE72-67790CD409C3}.DeleteRegistryEntries|Any CPU.ActiveCfg = Release|Any CPU
+		{7DDAD033-9D79-4617-AE72-67790CD409C3}.DeleteRegistryEntries|Any CPU.Build.0 = Release|Any CPU
+		{7DDAD033-9D79-4617-AE72-67790CD409C3}.HotFeatures|Any CPU.ActiveCfg = Release|Any CPU
+		{7DDAD033-9D79-4617-AE72-67790CD409C3}.HotFeatures|Any CPU.Build.0 = Release|Any CPU
+		{7DDAD033-9D79-4617-AE72-67790CD409C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7DDAD033-9D79-4617-AE72-67790CD409C3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7DDAD033-9D79-4617-AE72-67790CD409C3}.ReleaseVersion|Any CPU.ActiveCfg = Release|Any CPU
+		{7DDAD033-9D79-4617-AE72-67790CD409C3}.ReleaseVersion|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {22488BC4-502F-4279-94ED-9ABF4172B43A}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,14 @@
+{
+  "profiles": {
+    "LoxTools": {
+      "commandName": "Project"
+    },
+    "SimulateUpdateAvailable": {
+      "commandName": "Project",
+      "commandLineArgs": "--simulate-update",
+      "environmentVariables": {
+        "LOXTOOLS_SIMULATE_UPDATE": "1"
+      }
+    }
+  }
+}

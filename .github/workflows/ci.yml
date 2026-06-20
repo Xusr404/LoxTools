@@ -1,0 +1,89 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - Development
+      - master
+  push:
+    branches:
+      - Development
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    env:
+      SOLUTION_NAME: LoxTools.sln
+      RUNTIME_IDENTIFIER: win-x64
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install .NET SDK 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Set up MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Build solution
+        shell: pwsh
+        run: msbuild $env:SOLUTION_NAME /t:Restore,Build /p:Configuration=Release
+
+      - name: Run tests
+        shell: pwsh
+        run: dotnet test .\LoxTools.Tests\LoxTools.Tests.csproj --configuration Release --no-build --no-restore
+
+      - name: Determine development version
+        id: version
+        if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/master')
+        shell: pwsh
+        run: |
+          [xml]$project = Get-Content -LiteralPath "LoxTools/LoxTools.csproj"
+          $configuredVersion = $project.Project.PropertyGroup.Version |
+            Where-Object { -not [string]::IsNullOrWhiteSpace($_) } |
+            Select-Object -First 1
+
+          if ($configuredVersion -notmatch '^(?<core>\d+\.\d+\.\d+)(?:-(?:beta|rc)\.\d+)?$') {
+            throw "Unsupported project version '$configuredVersion'."
+          }
+
+          $date = [DateTime]::UtcNow.ToString('yyyyMMdd')
+          $developmentVersion = "$($Matches.core)-dev.$date.${{ github.run_number }}"
+          "value=$developmentVersion" >> $env:GITHUB_OUTPUT
+
+      - name: Install Inno Setup
+        if: steps.version.outcome == 'success'
+        shell: pwsh
+        run: choco install innosetup --no-progress --yes
+
+      - name: Publish application
+        if: steps.version.outcome == 'success'
+        shell: pwsh
+        run: .\scripts\Publish-Application.ps1 -AppVersion '${{ steps.version.outputs.value }}'
+
+      - name: Compile installer
+        if: steps.version.outcome == 'success'
+        shell: pwsh
+        run: .\scripts\Build-Installer.ps1 -AppVersion '${{ steps.version.outputs.value }}' -SkipPublish
+
+      - name: Package portable build and checksums
+        if: steps.version.outcome == 'success'
+        shell: pwsh
+        run: .\scripts\New-ReleaseAssets.ps1 -AppVersion '${{ steps.version.outputs.value }}' -RuntimeIdentifier $env:RUNTIME_IDENTIFIER
+
+      - name: Upload development packages
+        if: steps.version.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: LoxTools-${{ steps.version.outputs.value }}-${{ env.RUNTIME_IDENTIFIER }}
+          path: artifacts/release/*
+          if-no-files-found: error
+          retention-days: 14

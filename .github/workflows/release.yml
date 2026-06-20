@@ -1,0 +1,155 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - v*
+
+permissions:
+  contents: read
+
+jobs:
+  build-release:
+    runs-on: windows-latest
+    env:
+      RUNTIME_IDENTIFIER: win-x64
+
+    steps:
+      - name: Checkout complete history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate release tag and master provenance
+        id: version
+        shell: pwsh
+        run: |
+          $tag = '${{ github.ref_name }}'
+          if ($tag -notmatch '^v(?<version>\d+\.\d+\.\d+(?:-(?:beta|rc)\.\d+)?)$') {
+            throw "Unsupported release tag '$tag'. Use vMAJOR.MINOR.PATCH, vMAJOR.MINOR.PATCH-beta.N, or vMAJOR.MINOR.PATCH-rc.N."
+          }
+
+          $version = $Matches.version
+          [xml]$project = Get-Content -LiteralPath "LoxTools/LoxTools.csproj"
+          $projectVersion = $project.Project.PropertyGroup.Version |
+            Where-Object { -not [string]::IsNullOrWhiteSpace($_) } |
+            Select-Object -First 1
+
+          if ($projectVersion -ne $version) {
+            throw "Tag version '$version' does not match project version '$projectVersion'."
+          }
+
+          git fetch origin master --no-tags
+          if ($LASTEXITCODE -ne 0) {
+            throw "Could not fetch origin/master."
+          }
+
+          $taggedCommit = (git rev-list -n 1 $tag).Trim()
+          git merge-base --is-ancestor $taggedCommit origin/master
+          if ($LASTEXITCODE -ne 0) {
+            throw "Tagged commit '$taggedCommit' is not reachable from origin/master."
+          }
+
+          "value=$version" >> $env:GITHUB_OUTPUT
+
+      - name: Extract release notes
+        shell: pwsh
+        run: .\scripts\Get-ReleaseNotes.ps1 -AppVersion '${{ steps.version.outputs.value }}' -OutputPath 'artifacts/release-notes.md'
+
+      - name: Install .NET SDK 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Set up MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Install Inno Setup
+        shell: pwsh
+        run: choco install innosetup --no-progress --yes
+
+      - name: Publish application
+        shell: pwsh
+        run: .\scripts\Publish-Application.ps1 -AppVersion '${{ steps.version.outputs.value }}'
+
+      - name: Compile installer
+        shell: pwsh
+        run: .\scripts\Build-Installer.ps1 -AppVersion '${{ steps.version.outputs.value }}' -SkipPublish
+
+      - name: Package portable build and checksums
+        shell: pwsh
+        run: .\scripts\New-ReleaseAssets.ps1 -AppVersion '${{ steps.version.outputs.value }}' -RuntimeIdentifier $env:RUNTIME_IDENTIFIER
+
+      - name: Upload release assets for publication
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-assets
+          path: artifacts/release/*
+          if-no-files-found: error
+
+      - name: Upload release notes for publication
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-notes
+          path: artifacts/release-notes.md
+          if-no-files-found: error
+
+  publish-release:
+    needs: build-release
+    runs-on: windows-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download release assets
+        uses: actions/download-artifact@v4
+        with:
+          name: release-assets
+          path: release-assets
+
+      - name: Download release notes
+        uses: actions/download-artifact@v4
+        with:
+          name: release-notes
+          path: release-notes
+
+      - name: Publish GitHub release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = '${{ github.ref_name }}'
+          $version = $tag.Substring(1)
+
+          gh release view $tag --repo '${{ github.repository }}' *> $null
+          if ($LASTEXITCODE -eq 0) {
+            throw "Release '$tag' already exists. Published releases are not overwritten."
+          }
+
+          $assets = Get-ChildItem -LiteralPath 'release-assets' -File |
+            Where-Object { $_.Name -match '\.(exe|zip|txt)$' } |
+            ForEach-Object { $_.FullName }
+
+          if ($assets.Count -ne 3) {
+            throw "Expected exactly three release assets, found $($assets.Count)."
+          }
+
+          $arguments = @(
+            'release', 'create', $tag
+            '--repo', '${{ github.repository }}'
+            '--verify-tag'
+            '--title', "LoxTools $version"
+            '--notes-file', 'release-notes/release-notes.md'
+          )
+
+          if ($version.Contains('-')) {
+            $arguments += '--prerelease'
+          } else {
+            $arguments += '--latest'
+          }
+
+          $arguments += $assets
+          & gh @arguments
+          if ($LASTEXITCODE -ne 0) {
+            throw "GitHub release creation failed with exit code $LASTEXITCODE."
+          }
