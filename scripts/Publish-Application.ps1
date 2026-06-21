@@ -2,7 +2,8 @@ param(
     [string]$Configuration = "Release",
     [string]$RuntimeIdentifier = "win-x64",
     [string]$MsBuildPath = "",
-    [string]$AppVersion = ""
+    [string]$AppVersion = "",
+    [string]$UpdatePublisher = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -28,8 +29,8 @@ if ([string]::IsNullOrWhiteSpace($AppVersion)) {
     throw "Version is missing from $projectPath"
 }
 
-if ($AppVersion -notmatch '^\d+\.\d+\.\d+(?:-(?:(?:beta|rc)\.\d+|dev\.\d{8}\.\d+))?$') {
-    throw "Unsupported version '$AppVersion'. Use MAJOR.MINOR.PATCH, beta.N, rc.N, or the CI-only dev.YYYYMMDD.N suffix."
+if ($AppVersion -notmatch '^\d+\.\d+\.\d+(?:-(?:(?:alpha|beta|rc)\.\d+|dev\.\d{8}\.\d+))?$') {
+    throw "Unsupported version '$AppVersion'. Use MAJOR.MINOR.PATCH, alpha.N, beta.N, rc.N, or the CI-only dev.YYYYMMDD.N suffix."
 }
 
 if ([string]::IsNullOrWhiteSpace($MsBuildPath)) {
@@ -72,6 +73,7 @@ New-Item -ItemType Directory -Force -Path $publishDir | Out-Null
     /p:DebugType=None `
     /p:DebugSymbols=false `
     /p:SatelliteResourceLanguages=de%3Bde-DE `
+    "/p:LoxToolsUpdatePublisher=$UpdatePublisher" `
     /p:Version=$AppVersion
 
 if ($LASTEXITCODE -ne 0) {
@@ -112,13 +114,6 @@ $unexpectedCultureDirectories = @(
 if ($unexpectedCultureDirectories.Count -gt 0) {
     $unexpectedCultures = $unexpectedCultureDirectories.Name | Sort-Object
     throw "Publish output contains unsupported satellite cultures: $($unexpectedCultures -join ', ')"
-}
-
-foreach ($requiredCulture in $supportedSatelliteCultures) {
-    $culturePath = Join-Path $publishDir $requiredCulture
-    if (-not (Test-Path -LiteralPath $culturePath -PathType Container)) {
-        throw "Publish output is missing the required satellite culture '$requiredCulture': $culturePath"
-    }
 }
 
 $germanApplicationResources = Join-Path $publishDir "de-DE\LoxTools.resources.dll"

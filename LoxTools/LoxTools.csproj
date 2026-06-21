@@ -7,15 +7,23 @@
 	<UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
     <ApplicationIcon>Resources\LoxTools.ico</ApplicationIcon>
-    <Version>1.0.0</Version>
+    <Version>1.1.0-alpha.1</Version>
     <Product>LoxTools</Product>
     <AssemblyName>LoxTools</AssemblyName>
     <RootNamespace>LoxTools</RootNamespace>
     <Company>Xusr404</Company>
     <Authors>Xusr404</Authors>
+    <LoxToolsUpdatePublisher Condition="'$(LoxToolsUpdatePublisher)' == ''"></LoxToolsUpdatePublisher>
     <RunPostBuildEvent></RunPostBuildEvent>
     <Configurations>Debug;Release;ReleaseVersion;HotFeatures;DeleteRegistryEntries</Configurations>
   </PropertyGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+      <_Parameter1>LoxToolsUpdatePublisher</_Parameter1>
+      <_Parameter2>$(LoxToolsUpdatePublisher)</_Parameter2>
+    </AssemblyAttribute>
+  </ItemGroup>
 
   <ItemGroup>
     <COMReference Include="IWshRuntimeLibrary">

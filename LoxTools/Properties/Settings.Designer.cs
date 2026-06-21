@@ -143,5 +143,45 @@ namespace LoxTools.Properties {
             }
         }
 
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool AppUpdateAutoCheckEnabled {
+            get { return ((bool)(this["AppUpdateAutoCheckEnabled"])); }
+            set { this["AppUpdateAutoCheckEnabled"] = value; }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int AppUpdateChannel {
+            get { return ((int)(this["AppUpdateChannel"])); }
+            set { this["AppUpdateChannel"] = value; }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0001-01-01T00:00:00")]
+        public global::System.DateTime AppUpdateLastCheckUtc {
+            get { return ((global::System.DateTime)(this["AppUpdateLastCheckUtc"])); }
+            set { this["AppUpdateLastCheckUtc"] = value; }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int AppUpdateBackoffLevel {
+            get { return ((int)(this["AppUpdateBackoffLevel"])); }
+            set { this["AppUpdateBackoffLevel"] = value; }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string AppUpdateLastNotifiedVersion {
+            get { return ((string)(this["AppUpdateLastNotifiedVersion"])); }
+            set { this["AppUpdateLastNotifiedVersion"] = value; }
+        }
+
     }
 }

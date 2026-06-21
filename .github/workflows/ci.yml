@@ -3,16 +3,20 @@ name: CI
 on:
   pull_request:
     branches:
-      - Development
+      - development
       - master
   push:
     branches:
-      - Development
+      - development
       - master
   workflow_dispatch:
 
 permissions:
   contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -43,7 +47,7 @@ jobs:
 
       - name: Determine development version
         id: version
-        if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/master')
+        if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/development')
         shell: pwsh
         run: |
           [xml]$project = Get-Content -LiteralPath "LoxTools/LoxTools.csproj"
@@ -51,7 +55,7 @@ jobs:
             Where-Object { -not [string]::IsNullOrWhiteSpace($_) } |
             Select-Object -First 1
 
-          if ($configuredVersion -notmatch '^(?<core>\d+\.\d+\.\d+)(?:-(?:beta|rc)\.\d+)?$') {
+          if ($configuredVersion -notmatch '^(?<core>\d+\.\d+\.\d+)(?:-(?:alpha|beta|rc)\.\d+)?$') {
             throw "Unsupported project version '$configuredVersion'."
           }
 

@@ -534,6 +534,84 @@
                                 </StackPanel>
                             </Border>
 
+                            <!-- SECTION: LoxTools updates -->
+                            <Border Style="{StaticResource CardStyle}" Margin="0,0,0,14">
+                                <StackPanel>
+                                    <TextBlock Text="{Binding AppUpdatesSectionTitle}"
+                                               FontSize="{StaticResource FsSection}"
+                                               FontWeight="SemiBold"
+                                               Margin="0,0,0,14"/>
+
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                                            <TextBlock Text="{Binding AppUpdatesAutomaticTitle}" FontSize="{StaticResource FsLabel}"/>
+                                            <TextBlock Text="{Binding AppUpdatesAutomaticHint}"
+                                                       FontSize="{StaticResource FsSecondary}"
+                                                       Foreground="{StaticResource BrushSecondary}"
+                                                       Margin="0,2,0,0"/>
+                                        </StackPanel>
+                                        <ToggleButton Grid.Column="1"
+                                                      Style="{StaticResource SwitchStyle}"
+                                                      IsChecked="{Binding AppUpdateAutoCheckEnabled}"/>
+                                    </Grid>
+
+                                    <Separator Margin="0,14" Opacity="0.22"/>
+
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                                            <TextBlock Text="{Binding AppUpdatesChannelTitle}"
+                                                       FontSize="{StaticResource FsLabel}"/>
+                                            <TextBlock Text="{Binding AppUpdatesChannelHint}"
+                                                       FontSize="{StaticResource FsSecondary}"
+                                                       Foreground="{StaticResource BrushSecondary}"
+                                                       Margin="0,2,0,0"/>
+                                        </StackPanel>
+
+                                        <ComboBox Grid.Column="1"
+                                                  ItemsSource="{Binding AppUpdateChannels}"
+                                                  SelectedValue="{Binding SelectedAppUpdateChannel, Mode=TwoWay}"
+                                                  SelectedValuePath="Value"
+                                                  DisplayMemberPath="DisplayName"
+                                                  MinWidth="180"
+                                                  HorizontalAlignment="Right"
+                                                  Style="{StaticResource AppComboBoxStyle}"/>
+                                    </Grid>
+
+                                    <Separator Margin="0,14" Opacity="0.22"/>
+
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                                            <TextBlock Text="{Binding AppUpdateStatus}" FontSize="{StaticResource FsLabel}"/>
+                                            <TextBlock Text="{Binding AppUpdateLastCheck}"
+                                                       FontSize="{StaticResource FsSecondary}"
+                                                       Foreground="{StaticResource BrushSecondary}"
+                                                       Margin="0,2,0,0"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                                            <Button Content="{Binding AppUpdatesCheckNow}"
+                                                    Click="AppUpdateCheck_Click"
+                                                    Margin="0,0,10,0"/>
+                                            <Button Content="{Binding AppUpdateActionLabel}"
+                                                    Click="AppUpdateAction_Click"
+                                                    Visibility="{Binding AppUpdateActionVisibility}"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+
                             <!-- SECTION: Erweitert -->
                             <Border Style="{StaticResource CardStyle}">
                                 <StackPanel>
@@ -603,12 +681,34 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock Grid.Column="0"
-                               Text="{Binding ApplicationVersionDisplay}"
-                               FontSize="{StaticResource FsSecondary}"
-                               Foreground="{StaticResource BrushSecondary}"
-                               HorizontalAlignment="Left"
-                               VerticalAlignment="Bottom"/>
+                    <StackPanel Grid.Column="0"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Bottom">
+                        <Button Style="{StaticResource FooterUpdateLinkStyle}"
+                                Content="{Binding ApplicationName}"
+                                Click="OpenLoxToolsGitHub_Click"/>
+                        <TextBlock Text="·"
+                                   FontSize="{StaticResource FsSecondary}"
+                                   Foreground="{StaticResource BrushSecondary}"
+                                   Margin="{StaticResource FooterSeparatorMargin}"
+                                   VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding ApplicationVersionDisplay}"
+                                   FontSize="{StaticResource FsSecondary}"
+                                   Foreground="{StaticResource BrushSecondary}"
+                                   VerticalAlignment="Center"/>
+                        <TextBlock Text="·"
+                                   FontSize="{StaticResource FsSecondary}"
+                                   Foreground="{StaticResource BrushSecondary}"
+                                   Margin="{StaticResource FooterSeparatorMargin}"
+                                   VerticalAlignment="Center"
+                                   Visibility="{Binding AppUpdateFooterVisibility}"/>
+                        <Button Style="{StaticResource FooterUpdateLinkStyle}"
+                                Content="{Binding AppUpdateFooterText}"
+                                Click="AppUpdateAction_Click"
+                                IsEnabled="{Binding AppUpdateFooterActionEnabled}"
+                                Visibility="{Binding AppUpdateFooterVisibility}"/>
+                    </StackPanel>
 
                     <StackPanel Grid.Column="1"
                                 Orientation="Horizontal"
