@@ -6,7 +6,7 @@ The project uses Semantic Versioning and supports `alpha`, `beta`, `rc`, and sta
 
 ## [Unreleased]
 
-## [1.1.0-alpha.1] - 2026-06-21
+## [1.1.0] - 2026-06-21
 
 ### Added
 
