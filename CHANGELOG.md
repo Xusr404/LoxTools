@@ -10,21 +10,18 @@ The project uses Semantic Versioning and supports `alpha`, `beta`, `rc`, and sta
 
 ### Added
 
-- Versioned GitHub release automation for installer and portable packages.
-- GitHub-backed LoxTools update checks at startup and every 12 hours, with stable, beta, and alpha channels.
-- Localized LoxTools update controls and progress states in Settings, the footer, notifications, and the tray menu.
-- Optional Authenticode signing and signature verification in the release pipeline.
-- Automated coverage for release parsing, semantic-version precedence, channel selection, checksums, signatures, and installer launching.
+- Automatic LoxTools update checks with stable, beta, and alpha channels.
+- Update controls and progress information in Settings and the tray.
+- English and German installer support.
 
 ### Changed
 
-- Limited installer resources to English and German and removed release PDB and empty application-config artifacts while retaining the self-contained runtime.
-- Added English and German Inno Setup localization.
-- Verified application updates now download on demand, install silently, close the running instance safely, and restart LoxTools after installation.
+- Improved and reduced installer contents while retaining the included .NET runtime.
+- Updates can download and install silently, then restart LoxTools automatically.
 
 ### Security
 
-- Application updates require exact release asset names, bounded downloads, matching SHA-256 checksums, a valid Authenticode chain, and the configured publisher identity before execution.
+- Downloaded updates are verified before installation.
 
 ## [1.0.0] - 2026-06-19
 
