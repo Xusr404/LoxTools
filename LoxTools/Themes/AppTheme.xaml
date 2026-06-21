@@ -52,6 +52,7 @@
     <!-- ListBox sizing (min 1 item, max 10 items) -->
     <sys:Double x:Key="ListBoxItemHeight">40</sys:Double>
     <Thickness x:Key="ListBoxItemMargin">0,0,0,6</Thickness>
+    <Thickness x:Key="FooterSeparatorMargin">6,0</Thickness>
     <sys:Double x:Key="ListBoxMinHeight">40</sys:Double>
     <sys:Double x:Key="ListBoxMaxHeight">400</sys:Double>
     <sys:Double x:Key="PathDeleteButtonSize">28</sys:Double>
@@ -707,6 +708,31 @@
 
             <Trigger Property="IsPressed" Value="True">
                 <Setter Property="Background" Value="{StaticResource BrushAccentPressed}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="FooterUpdateLinkStyle" TargetType="Button">
+        <Setter Property="FontSize" Value="{StaticResource FsSecondary}"/>
+        <Setter Property="Foreground" Value="{StaticResource BrushAccent}"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <TextBlock Text="{TemplateBinding Content}"
+                               Foreground="{TemplateBinding Foreground}"
+                               FontSize="{TemplateBinding FontSize}"
+                               VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Cursor" Value="Arrow"/>
             </Trigger>
         </Style.Triggers>
     </Style>

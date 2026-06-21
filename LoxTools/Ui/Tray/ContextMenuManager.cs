@@ -6,6 +6,7 @@ using LoxTools.UI.Helpers;
 using LoxTools.UI.Tray.ContextMenuItems;
 using LoxTools.UI.Tray.ContextMenuItems.ToolStripItems;
 using LoxTools.UpdateCheck;
+using LoxTools.AppUpdates;
 using Microsoft.VisualBasic.Logging;
 using System;
 using System.Collections.Generic;
@@ -55,7 +56,9 @@ namespace LoxTools.UI.Tray {
         private static ConfigToolStripItem latestDefaultVersion { get; set; }
         private static ProcessToolStripItem updateCheckMenuItem { get; set; }
         private static ProcessToolStripItem updateChannelMenuItem { get; set; }
+        private static ProcessToolStripItem appUpdateMenuItem { get; set; }
         public static UpdateCheckService UpdateCheckService { get; set; }
+        public static AppUpdateService AppUpdateService { get; set; }
         private static System.Windows.Forms.Timer updateCheckDotsTimer;
         private static int updateCheckDotsIndex;
         private static UpdateCheckState updateCheckState;
@@ -71,6 +74,7 @@ namespace LoxTools.UI.Tray {
 		public static readonly List<ProcessToolStripItem> BaseToolStripItems = new List<ProcessToolStripItem>() {
             CreateUpdateCheckMenuItem(),
             CreateUpdateChannelMenuItem(),
+            CreateAppUpdateMenuItem(),
 			new ProcessToolStripItem (
 			    Lang.ProjectFolder,
                 null,
@@ -364,6 +368,65 @@ namespace LoxTools.UI.Tray {
             updateChannelMenuItem.Enabled = false;
             RefreshUpdateChannelMenuItem(GetConfiguredUpdateChannel());
             return updateChannelMenuItem;
+        }
+
+        private static ProcessToolStripItem CreateAppUpdateMenuItem() {
+            if (appUpdateMenuItem != null) return appUpdateMenuItem;
+            appUpdateMenuItem = new ProcessToolStripItem(Lang.AppUpdate_CheckNow, () => AppUpdateService?.HandlePrimaryAction());
+            appUpdateMenuItem.ImageScaling = ToolStripItemImageScaling.SizeToFit;
+            appUpdateMenuItem.Visible = false;
+            return appUpdateMenuItem;
+        }
+
+        public static void UpdateAppUpdateMenuItem(AppUpdateSnapshot snapshot) {
+            if (appUpdateMenuItem == null || snapshot == null) return;
+            appUpdateMenuItem.Visible = snapshot.State == AppUpdateState.UpdateAvailable
+                || snapshot.State == AppUpdateState.Downloading
+                || snapshot.State == AppUpdateState.Verifying
+                || snapshot.State == AppUpdateState.StartingInstaller;
+
+            if (!appUpdateMenuItem.Visible) return;
+
+            string version = snapshot.Release?.Version.ToString();
+            appUpdateMenuItem.Enabled = snapshot.State != AppUpdateState.Checking
+                && snapshot.State != AppUpdateState.Downloading
+                && snapshot.State != AppUpdateState.Verifying
+                && snapshot.State != AppUpdateState.StartingInstaller;
+
+            switch (snapshot.State) {
+                case AppUpdateState.Checking:
+                    appUpdateMenuItem.Text = Lang.AppUpdate_Checking;
+                    appUpdateMenuItem.Image = Properties.Resources.IconChecking;
+                    break;
+                case AppUpdateState.UpdateAvailable:
+                    appUpdateMenuItem.Text = string.Format(Lang.AppUpdate_AvailableInstall, version);
+                    appUpdateMenuItem.Image = Properties.Resources.IconDownloading;
+                    break;
+                case AppUpdateState.Downloading:
+                    appUpdateMenuItem.Text = Lang.AppUpdate_Downloading;
+                    appUpdateMenuItem.Image = Properties.Resources.IconDownloading;
+                    break;
+                case AppUpdateState.Verifying:
+                    appUpdateMenuItem.Text = Lang.AppUpdate_Verifying;
+                    appUpdateMenuItem.Image = Properties.Resources.IconChecking;
+                    break;
+                case AppUpdateState.StartingInstaller:
+                    appUpdateMenuItem.Text = Lang.AppUpdate_StartingInstaller;
+                    appUpdateMenuItem.Image = Properties.Resources.IconChecking;
+                    break;
+                case AppUpdateState.Failed:
+                    appUpdateMenuItem.Text = Lang.AppUpdate_Failed;
+                    appUpdateMenuItem.Image = Properties.Resources.IconFailed;
+                    break;
+                case AppUpdateState.UpToDate:
+                    appUpdateMenuItem.Text = string.Format(Lang.AppUpdate_UpToDate, snapshot.CurrentVersion);
+                    appUpdateMenuItem.Image = Properties.Resources.IconCheck;
+                    break;
+                default:
+                    appUpdateMenuItem.Text = Lang.AppUpdate_CheckNow;
+                    appUpdateMenuItem.Image = null;
+                    break;
+            }
         }
 
         public static void RefreshUpdateChannelMenuItem(UpdateChannel channel) {
@@ -757,7 +820,8 @@ namespace LoxTools.UI.Tray {
             }
 
             int channelIndex = updateChannelMenuItem == null ? -1 : contextMenu.Items.IndexOf(updateChannelMenuItem);
-            int separatorIndex = channelIndex > updateIndex ? channelIndex + 1 : updateIndex + 1;
+            int appUpdateIndex = appUpdateMenuItem == null ? -1 : contextMenu.Items.IndexOf(appUpdateMenuItem);
+            int separatorIndex = Math.Max(updateIndex, Math.Max(channelIndex, appUpdateIndex)) + 1;
             if (separatorIndex <= contextMenu.Items.Count - 1 && contextMenu.Items[separatorIndex] is ExtendedToolStripSeparator) {
                 return;
             }

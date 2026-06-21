@@ -35,16 +35,56 @@ Compression=lzma2
 SolidCompression=yes
 WizardStyle=modern
 CloseApplications=yes
-RestartApplications=no
+RestartApplications=yes
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
+Name: "german"; MessagesFile: "compiler:Languages\German.isl"
+
+[CustomMessages]
+english.LaunchApp=Launch LoxTools
+german.LaunchApp=LoxTools starten
 
 [Files]
-Source: "{#SourceDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#SourceDir}\*"; DestDir: "{app}"; Excludes: "*.pdb"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
 Name: "{autoprograms}\{#AppName}"; Filename: "{app}\{#AppExeName}"; WorkingDir: "{app}"; IconFilename: "{app}\{#AppExeName}"
 
 [Run]
-Filename: "{app}\{#AppExeName}"; Description: "Launch {#AppName}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\{#AppExeName}"; Flags: nowait skipifnotsilent
+Filename: "{app}\{#AppExeName}"; Description: "{cm:LaunchApp}"; Flags: nowait postinstall skipifsilent
+
+[Code]
+const
+  SynchronizeAccess = $00100000;
+
+function OpenProcess(DesiredAccess: LongWord; InheritHandle: Boolean; ProcessId: LongWord): THandle;
+  external 'OpenProcess@kernel32.dll stdcall';
+function WaitForSingleObject(Handle: THandle; Milliseconds: LongWord): LongWord;
+  external 'WaitForSingleObject@kernel32.dll stdcall';
+function CloseHandle(Handle: THandle): Boolean;
+  external 'CloseHandle@kernel32.dll stdcall';
+
+procedure WaitForUpdaterExit;
+var
+  ProcessId: Integer;
+  ProcessHandle: THandle;
+begin
+  ProcessId := StrToIntDef(ExpandConstant('{param:LoxToolsPid|0}'), 0);
+  if ProcessId <= 0 then
+    Exit;
+
+  ProcessHandle := OpenProcess(SynchronizeAccess, False, ProcessId);
+  if ProcessHandle <> 0 then
+  begin
+    WaitForSingleObject(ProcessHandle, 30000);
+    CloseHandle(ProcessHandle);
+  end;
+end;
+
+function PrepareToInstall(var NeedsRestart: Boolean): String;
+begin
+  WaitForUpdaterExit;
+  Result := '';
+end;

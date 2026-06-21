@@ -4,6 +4,7 @@ param(
     [string]$InnoSetupCompiler = "",
     [string]$MsBuildPath = "",
     [string]$AppVersion = "",
+    [string]$UpdatePublisher = "",
     [switch]$SkipPublish
 )
 
@@ -36,8 +37,8 @@ if ([string]::IsNullOrWhiteSpace($AppVersion)) {
     throw "Version is missing from $projectPath"
 }
 
-if ($AppVersion -notmatch '^\d+\.\d+\.\d+(?:-(?:(?:beta|rc)\.\d+|dev\.\d{8}\.\d+))?$') {
-    throw "Unsupported version '$AppVersion'. Use MAJOR.MINOR.PATCH, beta.N, rc.N, or the CI-only dev.YYYYMMDD.N suffix."
+if ($AppVersion -notmatch '^\d+\.\d+\.\d+(?:-(?:(?:alpha|beta|rc)\.\d+|dev\.\d{8}\.\d+))?$') {
+    throw "Unsupported version '$AppVersion'. Use MAJOR.MINOR.PATCH, alpha.N, beta.N, rc.N, or the CI-only dev.YYYYMMDD.N suffix."
 }
 
 if (Test-Path $installerOutputDir) {
@@ -50,7 +51,8 @@ if (-not $SkipPublish) {
         -Configuration $Configuration `
         -RuntimeIdentifier $RuntimeIdentifier `
         -MsBuildPath $MsBuildPath `
-        -AppVersion $AppVersion
+        -AppVersion $AppVersion `
+        -UpdatePublisher $UpdatePublisher
 
     if ($LASTEXITCODE -ne 0) {
         throw "Application publish failed with exit code $LASTEXITCODE."

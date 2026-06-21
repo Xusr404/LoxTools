@@ -8,7 +8,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-if ($AppVersion -notmatch '^\d+\.\d+\.\d+(?:-(?:beta|rc)\.\d+)?$') {
+if ($AppVersion -notmatch '^\d+\.\d+\.\d+(?:-(?:alpha|beta|rc)\.\d+)?$') {
     throw "Unsupported release version '$AppVersion'."
 }
 

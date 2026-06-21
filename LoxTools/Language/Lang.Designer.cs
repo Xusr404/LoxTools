@@ -775,6 +775,31 @@ namespace LoxTools.Language {
             }
         }
 
+        internal static string AppUpdate_SettingsSection => ResourceManager.GetString("AppUpdate_SettingsSection", resourceCulture);
+        internal static string AppUpdate_AutomaticTitle => ResourceManager.GetString("AppUpdate_AutomaticTitle", resourceCulture);
+        internal static string AppUpdate_AutomaticHint => ResourceManager.GetString("AppUpdate_AutomaticHint", resourceCulture);
+        internal static string AppUpdate_ChannelTitle => ResourceManager.GetString("AppUpdate_ChannelTitle", resourceCulture);
+        internal static string AppUpdate_ChannelHint => ResourceManager.GetString("AppUpdate_ChannelHint", resourceCulture);
+        internal static string AppUpdate_ChannelStable => ResourceManager.GetString("AppUpdate_ChannelStable", resourceCulture);
+        internal static string AppUpdate_ChannelBeta => ResourceManager.GetString("AppUpdate_ChannelBeta", resourceCulture);
+        internal static string AppUpdate_ChannelAlpha => ResourceManager.GetString("AppUpdate_ChannelAlpha", resourceCulture);
+        internal static string AppUpdate_CheckNow => ResourceManager.GetString("AppUpdate_CheckNow", resourceCulture);
+        internal static string AppUpdate_Checking => ResourceManager.GetString("AppUpdate_Checking", resourceCulture);
+        internal static string AppUpdate_UpToDate => ResourceManager.GetString("AppUpdate_UpToDate", resourceCulture);
+        internal static string AppUpdate_StatusAvailable => ResourceManager.GetString("AppUpdate_StatusAvailable", resourceCulture);
+        internal static string AppUpdate_AvailableInstall => ResourceManager.GetString("AppUpdate_AvailableInstall", resourceCulture);
+        internal static string AppUpdate_Downloading => ResourceManager.GetString("AppUpdate_Downloading", resourceCulture);
+        internal static string AppUpdate_FooterDownloading => ResourceManager.GetString("AppUpdate_FooterDownloading", resourceCulture);
+        internal static string AppUpdate_Verifying => ResourceManager.GetString("AppUpdate_Verifying", resourceCulture);
+        internal static string AppUpdate_StartingInstaller => ResourceManager.GetString("AppUpdate_StartingInstaller", resourceCulture);
+        internal static string AppUpdate_Failed => ResourceManager.GetString("AppUpdate_Failed", resourceCulture);
+        internal static string AppUpdate_StatusIdle => ResourceManager.GetString("AppUpdate_StatusIdle", resourceCulture);
+        internal static string AppUpdate_NeverChecked => ResourceManager.GetString("AppUpdate_NeverChecked", resourceCulture);
+        internal static string AppUpdate_LastChecked => ResourceManager.GetString("AppUpdate_LastChecked", resourceCulture);
+        internal static string AppUpdate_UpdateNow => ResourceManager.GetString("AppUpdate_UpdateNow", resourceCulture);
+        internal static string AppUpdate_NotificationTitle => ResourceManager.GetString("AppUpdate_NotificationTitle", resourceCulture);
+        internal static string AppUpdate_NotificationText => ResourceManager.GetString("AppUpdate_NotificationText", resourceCulture);
+
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die VersionSelector ähnelt.
         /// </summary>

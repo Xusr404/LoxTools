@@ -24,11 +24,12 @@ using LoxTools.Models;
 using LoxTools.UI.Helpers;
 using LoxTools.UI.Tray;
 using LoxTools.UpdateCheck;
+using LoxTools.AppUpdates;
 using WinForms = System.Windows.Forms;
 
 namespace LoxTools {
 	public partial class SettingsWindow : Window {
-		public SettingsVm Vm { get; }
+		internal SettingsVm Vm { get; }
 		public event EventHandler SettingsSaved;
 
 		public SettingsWindow() {
@@ -36,6 +37,11 @@ namespace LoxTools {
 
 			Vm = new SettingsVm();
 			DataContext = Vm;
+			if (ContextMenuManager.AppUpdateService != null) {
+				Vm.ApplyAppUpdateSnapshot(ContextMenuManager.AppUpdateService.CurrentSnapshot);
+				ContextMenuManager.AppUpdateService.StateChanged += AppUpdateService_StateChanged;
+			}
+			Closed += SettingsWindow_Closed;
 
 			Title = Vm.LangSettings;
 			Loaded += SettingsWindow_Loaded;
@@ -55,6 +61,7 @@ namespace LoxTools {
 		private void SettingsWindow_Loaded(object sender, RoutedEventArgs e) {
 			Vm.RefreshLaunchModeBindings();
 			Vm.RefreshFileAssociations();
+			ContextMenuManager.AppUpdateService?.CheckIfStale();
 		}
 
 		private void SettingsWindow_Activated(object sender, EventArgs e) {
@@ -178,6 +185,26 @@ namespace LoxTools {
 
 		private void Cancel_Click(object sender, RoutedEventArgs e) => Close();
 
+		private void AppUpdateCheck_Click(object sender, RoutedEventArgs e) => ContextMenuManager.AppUpdateService?.CheckNow();
+		private void AppUpdateAction_Click(object sender, RoutedEventArgs e) => ContextMenuManager.AppUpdateService?.HandlePrimaryAction();
+		private void OpenLoxToolsGitHub_Click(object sender, RoutedEventArgs e) {
+			try {
+				Process.Start(new ProcessStartInfo {
+					FileName = "https://github.com/Xusr404/LoxTools",
+					UseShellExecute = true
+				});
+			}
+			catch { }
+		}
+
+		private void AppUpdateService_StateChanged(object sender, AppUpdateSnapshot snapshot) => Vm.ApplyAppUpdateSnapshot(snapshot);
+
+		private void SettingsWindow_Closed(object sender, EventArgs e) {
+			if (ContextMenuManager.AppUpdateService != null) {
+				ContextMenuManager.AppUpdateService.StateChanged -= AppUpdateService_StateChanged;
+			}
+		}
+
 		private void OpenDefaultApps_Click(object sender, RoutedEventArgs e) {
 			string registeredName = InitialSetup.RegisteredAppName;
 			string deepLink = $"ms-settings:defaultapps?registeredAppUser={Uri.EscapeDataString(registeredName)}";
@@ -199,19 +226,26 @@ namespace LoxTools {
 
 	}
 
-	public sealed class SettingsVm : INotifyPropertyChanged {
+	internal sealed class SettingsVm : INotifyPropertyChanged {
 		private static readonly EditSettings SettingsEditor = new EditSettings();
 		private const string UpdateChannelRegistryValueName = "UpdateChannel";
 		private const bool SortConfigVersionsByFileVersion = VersionDisplayHelper.SortByFileVersionOnly;
 		private const string IncludeAlphaRegistryValueName = "IncludeAlpha";
 		private UpdateChannel initialUpdateChannel;
+		private AppUpdateChannel initialAppUpdateChannel;
+		private bool initialAppUpdateAutoCheckEnabled;
 		public SettingsVm() {
 			RefreshUpdateChannelOptions();
+			RefreshAppUpdateChannelOptions();
 			SettingsGuard.Execute(() => {
 				Autostartup = Properties.Settings.Default.Autostartup;
 				MiddleMouseButtonEvent = Properties.Settings.Default.middleMouseButtonEvent;
 				SelectedUpdateChannel = LoadUpdateChannelSetting();
 				initialUpdateChannel = SelectedUpdateChannel;
+				AppUpdateAutoCheckEnabled = Properties.Settings.Default.AppUpdateAutoCheckEnabled;
+				initialAppUpdateAutoCheckEnabled = AppUpdateAutoCheckEnabled;
+				SelectedAppUpdateChannel = LoadAppUpdateChannelSetting();
+				initialAppUpdateChannel = SelectedAppUpdateChannel;
 				AlwaysShowSelectionDialog = Properties.Settings.Default.alwaysShowSelectionDialog;
 				UseLatestVersion = Properties.Settings.Default.useLatestVersion;
 				LoadInstalledVersions();
@@ -224,6 +258,10 @@ namespace LoxTools {
 				MiddleMouseButtonEvent = false;
 				SelectedUpdateChannel = UpdateChannel.Release;
 				initialUpdateChannel = SelectedUpdateChannel;
+				AppUpdateAutoCheckEnabled = true;
+				initialAppUpdateAutoCheckEnabled = AppUpdateAutoCheckEnabled;
+				SelectedAppUpdateChannel = AppUpdateChannel.Stable;
+				initialAppUpdateChannel = SelectedAppUpdateChannel;
 				AlwaysShowSelectionDialog = false;
 				UseLatestVersion = false;
 				LoadInstalledVersions();
@@ -260,12 +298,16 @@ namespace LoxTools {
 		public string LangUpdateChannelRelease => Lang.SettingsUpdateChannel_Release;
 		public string LangUpdateChannelBeta => Lang.SettingsUpdateChannel_Beta;
 		public string LangUpdateChannelAlpha => Lang.SettingsUpdateChannel_Alpha;
+		public string AppUpdatesSectionTitle => Lang.AppUpdate_SettingsSection;
+		public string AppUpdatesAutomaticTitle => Lang.AppUpdate_AutomaticTitle;
+		public string AppUpdatesAutomaticHint => Lang.AppUpdate_AutomaticHint;
+		public string AppUpdatesChannelTitle => Lang.AppUpdate_ChannelTitle;
+		public string AppUpdatesChannelHint => Lang.AppUpdate_ChannelHint;
+		public string AppUpdatesCheckNow => Lang.AppUpdate_CheckNow;
 		public string LangSave => Lang.Save;
 		public string LangCancel => Lang.Cancel;
-		public string ApplicationVersionDisplay => string.Concat(
-			GetApplicationName(),
-			" · ",
-			string.Format(Lang.ApplicationVersionFormat, GetApplicationVersion()));
+		public string ApplicationName => GetApplicationName();
+		public string ApplicationVersionDisplay => string.Format(Lang.ApplicationVersionFormat, GetApplicationVersion());
 		public string LaunchModeTitle => Lang.LaunchModeTitle;
 		public string LaunchModeHint => Lang.LaunchModeHint;
 		public string UseLatestVersionOptionTitle => Lang.UseLatestVersionOptionTitle;
@@ -281,6 +323,7 @@ namespace LoxTools {
 		public ObservableCollection<string> ProjectPaths { get; } = new ObservableCollection<string>();
 		public ObservableCollection<InstalledVersionOption> InstalledVersions { get; } = new ObservableCollection<InstalledVersionOption>();
 		public ObservableCollection<UpdateChannelOption> UpdateChannels { get; } = new ObservableCollection<UpdateChannelOption>();
+		public ObservableCollection<AppUpdateChannelOption> AppUpdateChannels { get; } = new ObservableCollection<AppUpdateChannelOption>();
 
 		private static string GetApplicationVersion() {
 			Assembly assembly = typeof(SettingsVm).Assembly;
@@ -357,6 +400,78 @@ namespace LoxTools {
 			}
 		}
 
+		private bool _appUpdateAutoCheckEnabled;
+		public bool AppUpdateAutoCheckEnabled { get => _appUpdateAutoCheckEnabled; set { _appUpdateAutoCheckEnabled = value; OnPropertyChanged(); } }
+
+		private AppUpdateChannel _selectedAppUpdateChannel;
+		public AppUpdateChannel SelectedAppUpdateChannel {
+			get => _selectedAppUpdateChannel;
+			set {
+				if (_selectedAppUpdateChannel == value) return;
+				_selectedAppUpdateChannel = value;
+				OnPropertyChanged();
+			}
+		}
+
+		private string _appUpdateStatus = Lang.AppUpdate_StatusIdle;
+		public string AppUpdateStatus { get => _appUpdateStatus; private set { _appUpdateStatus = value; OnPropertyChanged(); } }
+		private string _appUpdateLastCheck;
+		public string AppUpdateLastCheck { get => _appUpdateLastCheck; private set { _appUpdateLastCheck = value; OnPropertyChanged(); } }
+		private string _appUpdateActionLabel = Lang.AppUpdate_CheckNow;
+		public string AppUpdateActionLabel { get => _appUpdateActionLabel; private set { _appUpdateActionLabel = value; OnPropertyChanged(); } }
+		private string _appUpdateFooterText;
+		public string AppUpdateFooterText { get => _appUpdateFooterText; private set { _appUpdateFooterText = value; OnPropertyChanged(); } }
+		private Visibility _appUpdateFooterVisibility = Visibility.Collapsed;
+		public Visibility AppUpdateFooterVisibility { get => _appUpdateFooterVisibility; private set { _appUpdateFooterVisibility = value; OnPropertyChanged(); } }
+		private bool _appUpdateFooterActionEnabled;
+		public bool AppUpdateFooterActionEnabled { get => _appUpdateFooterActionEnabled; private set { _appUpdateFooterActionEnabled = value; OnPropertyChanged(); } }
+		private Visibility _appUpdateActionVisibility = Visibility.Collapsed;
+		public Visibility AppUpdateActionVisibility { get => _appUpdateActionVisibility; private set { _appUpdateActionVisibility = value; OnPropertyChanged(); } }
+
+		public void ApplyAppUpdateSnapshot(AppUpdateSnapshot snapshot) {
+			if (snapshot == null) return;
+			string version = snapshot.Release?.Version.ToString();
+			switch (snapshot.State) {
+				case AppUpdateState.Checking: AppUpdateStatus = Lang.AppUpdate_Checking; break;
+				case AppUpdateState.UpToDate: AppUpdateStatus = string.Format(Lang.AppUpdate_UpToDate, snapshot.CurrentVersion); break;
+				case AppUpdateState.UpdateAvailable: AppUpdateStatus = string.Format(Lang.AppUpdate_StatusAvailable, version); break;
+				case AppUpdateState.Downloading: AppUpdateStatus = Lang.AppUpdate_Downloading; break;
+				case AppUpdateState.Verifying: AppUpdateStatus = Lang.AppUpdate_Verifying; break;
+				case AppUpdateState.StartingInstaller: AppUpdateStatus = Lang.AppUpdate_StartingInstaller; break;
+				case AppUpdateState.Failed: AppUpdateStatus = Lang.AppUpdate_Failed; break;
+				default: AppUpdateStatus = Lang.AppUpdate_StatusIdle; break;
+			}
+			AppUpdateLastCheck = snapshot.LastCheckUtc == DateTime.MinValue ? Lang.AppUpdate_NeverChecked : string.Format(Lang.AppUpdate_LastChecked, snapshot.LastCheckUtc.ToLocalTime());
+			AppUpdateActionLabel = Lang.AppUpdate_UpdateNow;
+			switch (snapshot.State) {
+				case AppUpdateState.UpdateAvailable:
+					AppUpdateFooterText = string.Format(Lang.AppUpdate_AvailableInstall, version);
+					break;
+				case AppUpdateState.Downloading:
+					AppUpdateFooterText = string.Format(Lang.AppUpdate_FooterDownloading, version);
+					break;
+				case AppUpdateState.Verifying:
+					AppUpdateFooterText = Lang.AppUpdate_Verifying;
+					break;
+				case AppUpdateState.StartingInstaller:
+					AppUpdateFooterText = Lang.AppUpdate_StartingInstaller;
+					break;
+				default:
+					AppUpdateFooterText = string.Empty;
+					break;
+			}
+			AppUpdateFooterVisibility = snapshot.State == AppUpdateState.UpdateAvailable
+				|| snapshot.State == AppUpdateState.Downloading
+				|| snapshot.State == AppUpdateState.Verifying
+				|| snapshot.State == AppUpdateState.StartingInstaller
+				? Visibility.Visible
+				: Visibility.Collapsed;
+			AppUpdateFooterActionEnabled = snapshot.State == AppUpdateState.UpdateAvailable;
+			AppUpdateActionVisibility = snapshot.State == AppUpdateState.UpdateAvailable
+				? Visibility.Visible
+				: Visibility.Collapsed;
+		}
+
 		private bool _alwaysShowSelectionDialog;
 		public bool AlwaysShowSelectionDialog { get => _alwaysShowSelectionDialog; set { _alwaysShowSelectionDialog = value; OnPropertyChanged(); } }
 
@@ -428,11 +543,23 @@ namespace LoxTools {
 			return includeAlpha ? UpdateChannel.Alpha : UpdateChannel.Release;
 		}
 
+		private static AppUpdateChannel LoadAppUpdateChannelSetting() {
+			int value = Properties.Settings.Default.AppUpdateChannel;
+			return Enum.IsDefined(typeof(AppUpdateChannel), value) ? (AppUpdateChannel)value : AppUpdateChannel.Stable;
+		}
+
 		private void RefreshUpdateChannelOptions() {
 			UpdateChannels.Clear();
 			UpdateChannels.Add(new UpdateChannelOption(LangUpdateChannelRelease, UpdateChannel.Release));
 			UpdateChannels.Add(new UpdateChannelOption(LangUpdateChannelBeta, UpdateChannel.Beta));
 			UpdateChannels.Add(new UpdateChannelOption(LangUpdateChannelAlpha, UpdateChannel.Alpha));
+		}
+
+		private void RefreshAppUpdateChannelOptions() {
+			AppUpdateChannels.Clear();
+			AppUpdateChannels.Add(new AppUpdateChannelOption(Lang.AppUpdate_ChannelStable, AppUpdateChannel.Stable));
+			AppUpdateChannels.Add(new AppUpdateChannelOption(Lang.AppUpdate_ChannelBeta, AppUpdateChannel.Beta));
+			AppUpdateChannels.Add(new AppUpdateChannelOption(Lang.AppUpdate_ChannelAlpha, AppUpdateChannel.Alpha));
 		}
 
 		public void LoadPaths(IEnumerable<string> configPaths, IEnumerable<string> projectPaths) {
@@ -545,6 +672,8 @@ namespace LoxTools {
 		public void SaveToSettings() {
 			bool updateChannelChanged = SelectedUpdateChannel != initialUpdateChannel;
 			bool updateChannelPersisted = !updateChannelChanged;
+			bool appUpdateSettingsChanged = SelectedAppUpdateChannel != initialAppUpdateChannel
+				|| AppUpdateAutoCheckEnabled != initialAppUpdateAutoCheckEnabled;
 
 			if (updateChannelChanged) {
 				bool wrote = RegistryFlagReader.SetDwordValue(UpdateChannelRegistryValueName, (int)SelectedUpdateChannel);
@@ -559,6 +688,8 @@ namespace LoxTools {
 				Properties.Settings.Default.middleMouseButtonEvent = MiddleMouseButtonEvent;
 				Properties.Settings.Default.alwaysShowSelectionDialog = AlwaysShowSelectionDialog;
 				Properties.Settings.Default.useLatestVersion = UseLatestVersion;
+				Properties.Settings.Default.AppUpdateAutoCheckEnabled = AppUpdateAutoCheckEnabled;
+				Properties.Settings.Default.AppUpdateChannel = (int)SelectedAppUpdateChannel;
 
 				if (!UseLatestVersion && SelectedFixedVersion != null) {
 					Properties.Settings.Default.defaultVersion = SelectedFixedVersion.Path;
@@ -569,6 +700,11 @@ namespace LoxTools {
 
 				Properties.Settings.Default.Save();
 			});
+			if (appUpdateSettingsChanged) {
+				initialAppUpdateChannel = SelectedAppUpdateChannel;
+				initialAppUpdateAutoCheckEnabled = AppUpdateAutoCheckEnabled;
+				ContextMenuManager.AppUpdateService?.ApplySettings(AppUpdateAutoCheckEnabled, SelectedAppUpdateChannel);
+			}
 
 			if (updateChannelChanged && updateChannelPersisted) {
 				initialUpdateChannel = SelectedUpdateChannel;
@@ -644,6 +780,16 @@ namespace LoxTools {
 
 			public string DisplayName { get; }
 			public UpdateChannel Value { get; }
+		}
+
+		public sealed class AppUpdateChannelOption {
+			internal AppUpdateChannelOption(string displayName, AppUpdateChannel value) {
+				DisplayName = displayName ?? string.Empty;
+				Value = value;
+			}
+
+			public string DisplayName { get; }
+			public object Value { get; }
 		}
 
 		private string BuildCombinedAssociationStatus(string primaryExtension, string secondaryExtension) {

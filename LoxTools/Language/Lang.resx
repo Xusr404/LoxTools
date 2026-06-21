@@ -256,10 +256,10 @@
     <value>Folders where projects are stored</value>
   </data>
   <data name="SettingsUpdateChannelTitle" xml:space="preserve">
-    <value>Update channel</value>
+    <value>Loxone Config update channel</value>
   </data>
   <data name="SettingsUpdateChannelHint" xml:space="preserve">
-    <value>Choose which update channel should be checked and offered for download.</value>
+    <value>Choose which Loxone Config channel should be checked and offered for download.</value>
   </data>
   <data name="SettingsUpdateChannel_Release" xml:space="preserve">
     <value>Release</value>
@@ -349,57 +349,81 @@
     <value>Run when starting Windows</value>
   </data>
   <data name="UpdateCheck_Checking" xml:space="preserve">
-    <value>Checking .</value>
+    <value>Checking Loxone Config updates .</value>
   </data>
   <data name="UpdateCheck_Checking_WithDots" xml:space="preserve">
-    <value>Checking{0}</value>
+    <value>Checking Loxone Config updates{0}</value>
   </data>
   <data name="UpdateCheck_Downloading_WithDots" xml:space="preserve">
-    <value>Downloading{0}</value>
+    <value>Downloading Loxone Config update{0}</value>
   </data>
   <data name="UpdateCheck_UpdateAvailable_Release" xml:space="preserve">
-    <value>Release update available - Download &amp; install</value>
+    <value>Loxone Config release update available - Download &amp; install</value>
   </data>
   <data name="UpdateCheck_UpdateAvailable_Release_WithVersion" xml:space="preserve">
-    <value>Release update available ({0}) - Download &amp; install</value>
+    <value>Loxone Config release update available ({0}) - Download &amp; install</value>
   </data>
   <data name="UpdateCheck_UpdateAvailable_Beta" xml:space="preserve">
-    <value>Beta update available - Download &amp; install</value>
+    <value>Loxone Config beta update available - Download &amp; install</value>
   </data>
   <data name="UpdateCheck_UpdateAvailable_Beta_WithVersion" xml:space="preserve">
-    <value>Beta update available ({0}) - Download &amp; install</value>
+    <value>Loxone Config beta update available ({0}) - Download &amp; install</value>
   </data>
   <data name="UpdateCheck_UpdateAvailable_Alpha" xml:space="preserve">
-    <value>Alpha update available - Download &amp; install</value>
+    <value>Loxone Config alpha update available - Download &amp; install</value>
   </data>
   <data name="UpdateCheck_UpdateAvailable_Alpha_WithVersion" xml:space="preserve">
-    <value>Alpha update available ({0}) - Download &amp; install</value>
+    <value>Loxone Config alpha update available ({0}) - Download &amp; install</value>
   </data>
   <data name="UpdateCheck_UpToDate_Release" xml:space="preserve">
-    <value>Latest Config release installed</value>
+    <value>Latest Loxone Config release installed</value>
   </data>
   <data name="UpdateCheck_UpToDate_Release_WithVersion" xml:space="preserve">
-    <value>Latest Config release installed ({0})</value>
+    <value>Latest Loxone Config release installed ({0})</value>
   </data>
   <data name="UpdateCheck_UpToDate_Beta" xml:space="preserve">
-    <value>Latest Config beta installed</value>
+    <value>Latest Loxone Config beta installed</value>
   </data>
   <data name="UpdateCheck_UpToDate_Beta_WithVersion" xml:space="preserve">
-    <value>Latest Config beta installed ({0})</value>
+    <value>Latest Loxone Config beta installed ({0})</value>
   </data>
   <data name="UpdateCheck_UpToDate_Alpha" xml:space="preserve">
-    <value>Latest Config alpha installed</value>
+    <value>Latest Loxone Config alpha installed</value>
   </data>
   <data name="UpdateCheck_UpToDate_Alpha_WithVersion" xml:space="preserve">
-    <value>Latest Config alpha installed ({0})</value>
+    <value>Latest Loxone Config alpha installed ({0})</value>
   </data>
   <data name="UpdateCheck_NoAlphaAvailable" xml:space="preserve">
     <value>No alpha update available</value>
   </data>
   <data name="UpdateCheck_Failed" xml:space="preserve">
-    <value>Update check failed</value>
+    <value>Loxone Config update check failed</value>
   </data>
   <data name="UpdateCheck_CheckAgain" xml:space="preserve">
-    <value>Check again</value>
+    <value>Check Loxone Config again</value>
   </data>
+  <data name="AppUpdate_SettingsSection" xml:space="preserve"><value>LoxTools updates</value></data>
+  <data name="AppUpdate_AutomaticTitle" xml:space="preserve"><value>Automatic update checks</value></data>
+  <data name="AppUpdate_AutomaticHint" xml:space="preserve"><value>Check after startup and periodically while LoxTools is running.</value></data>
+  <data name="AppUpdate_ChannelTitle" xml:space="preserve"><value>Release channel</value></data>
+  <data name="AppUpdate_ChannelHint" xml:space="preserve"><value>Beta includes release candidates and stable releases. Alpha includes every channel.</value></data>
+  <data name="AppUpdate_ChannelStable" xml:space="preserve"><value>Stable</value></data>
+  <data name="AppUpdate_ChannelBeta" xml:space="preserve"><value>Beta</value></data>
+  <data name="AppUpdate_ChannelAlpha" xml:space="preserve"><value>Alpha</value></data>
+  <data name="AppUpdate_CheckNow" xml:space="preserve"><value>Check LoxTools updates</value></data>
+  <data name="AppUpdate_Checking" xml:space="preserve"><value>Checking for LoxTools updates…</value></data>
+  <data name="AppUpdate_UpToDate" xml:space="preserve"><value>LoxTools is up to date ({0})</value></data>
+  <data name="AppUpdate_StatusAvailable" xml:space="preserve"><value>LoxTools {0} is available</value></data>
+  <data name="AppUpdate_AvailableInstall" xml:space="preserve"><value>LoxTools {0} available — Update now</value></data>
+  <data name="AppUpdate_Downloading" xml:space="preserve"><value>Downloading LoxTools update…</value></data>
+  <data name="AppUpdate_FooterDownloading" xml:space="preserve"><value>Downloading version {0}…</value></data>
+  <data name="AppUpdate_Verifying" xml:space="preserve"><value>Verifying LoxTools installer…</value></data>
+  <data name="AppUpdate_StartingInstaller" xml:space="preserve"><value>Starting LoxTools installer…</value></data>
+  <data name="AppUpdate_Failed" xml:space="preserve"><value>LoxTools update check failed — Check again</value></data>
+  <data name="AppUpdate_StatusIdle" xml:space="preserve"><value>LoxTools update checks are ready</value></data>
+  <data name="AppUpdate_NeverChecked" xml:space="preserve"><value>Not checked yet</value></data>
+  <data name="AppUpdate_LastChecked" xml:space="preserve"><value>Last checked: {0:g}</value></data>
+  <data name="AppUpdate_UpdateNow" xml:space="preserve"><value>Update now</value></data>
+  <data name="AppUpdate_NotificationTitle" xml:space="preserve"><value>LoxTools update available</value></data>
+  <data name="AppUpdate_NotificationText" xml:space="preserve"><value>Version {0} is available. Click to update.</value></data>
 </root>

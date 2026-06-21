@@ -32,5 +32,20 @@
     <Setting Name="UpdateBackoffLevel" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
+    <Setting Name="AppUpdateAutoCheckEnabled" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="AppUpdateChannel" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="AppUpdateLastCheckUtc" Type="System.DateTime" Scope="User">
+      <Value Profile="(Default)">0001-01-01T00:00:00</Value>
+    </Setting>
+    <Setting Name="AppUpdateBackoffLevel" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="AppUpdateLastNotifiedVersion" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>

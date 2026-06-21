@@ -27,6 +27,7 @@ namespace LoxTools {
     using UI.Helpers;
     using UI.Tray;
     using UpdateCheck;
+    using AppUpdates;
     class LoxToolsApplication : ApplicationContext, ISingleInstance {
 		private static LoxToolsApplication _instance;
 		#region Public Obejcts needed for the App
@@ -58,6 +59,7 @@ namespace LoxTools {
         private readonly SemaphoreSlim refreshSemaphore = new SemaphoreSlim(1, 1);
         private const int RefreshDebounceMs = 1000;
         private UpdateCheckService updateCheckService;
+        private AppUpdateService appUpdateService;
         private bool simulateUpdateAvailable;
         private const int FirstStartupScanBudgetMs = 300;
         private const int FirstStartupScanEntryLimit = 500;
@@ -159,6 +161,7 @@ namespace LoxTools {
             createFileWatchers(ProjectsFolderPaths, WatcherFilter.loxoneFile);
             setupContextMenu();
             InitializeUpdateCheckService();
+            InitializeAppUpdateService();
             #endregion
 
             #region
@@ -410,6 +413,7 @@ namespace LoxTools {
 
             icon.MouseDoubleClick += TrayIcon_DoubleClick;
             icon.MouseDown += TrayIcon_MouseDown;
+            icon.BalloonTipClicked += (sender, args) => appUpdateService?.HandlePrimaryAction();
             icon.Visible = true;
 
             return icon;
@@ -632,6 +636,7 @@ namespace LoxTools {
         private void onApplicationExit(object sender, EventArgs e) {
             try {
                 updateCheckService?.Dispose();
+                appUpdateService?.Dispose();
                 TrayIcon.Visible = false;
                 TrayIcon.Dispose();
             } catch (Exception ex) { MessageBox.Show(ex.ToString()); }
@@ -791,6 +796,23 @@ namespace LoxTools {
                 simulateUpdateAvailable);
             ContextMenuManager.UpdateCheckService = updateCheckService;
             updateCheckService.Start();
+        }
+
+        private void InitializeAppUpdateService() {
+            if (appUpdateService != null) return;
+
+            appUpdateService = new AppUpdateService(uiInvokeControl, CloseThisApplication);
+            appUpdateService.StateChanged += (sender, snapshot) => ContextMenuManager.UpdateAppUpdateMenuItem(snapshot);
+            appUpdateService.UpdateNotificationRequested += (sender, snapshot) => {
+                if (TrayIcon == null || snapshot?.Release == null) return;
+                TrayIcon.BalloonTipTitle = Lang.AppUpdate_NotificationTitle;
+                TrayIcon.BalloonTipText = string.Format(Lang.AppUpdate_NotificationText, snapshot.Release.Version);
+                TrayIcon.BalloonTipIcon = ToolTipIcon.Info;
+                TrayIcon.ShowBalloonTip(8000);
+            };
+            ContextMenuManager.AppUpdateService = appUpdateService;
+            ContextMenuManager.UpdateAppUpdateMenuItem(appUpdateService.CurrentSnapshot);
+            appUpdateService.Start();
         }
 
         private IReadOnlyList<string> GetLocalBuildIds() {

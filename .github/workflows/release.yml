@@ -25,8 +25,8 @@ jobs:
         shell: pwsh
         run: |
           $tag = '${{ github.ref_name }}'
-          if ($tag -notmatch '^v(?<version>\d+\.\d+\.\d+(?:-(?:beta|rc)\.\d+)?)$') {
-            throw "Unsupported release tag '$tag'. Use vMAJOR.MINOR.PATCH, vMAJOR.MINOR.PATCH-beta.N, or vMAJOR.MINOR.PATCH-rc.N."
+          if ($tag -notmatch '^v(?<version>\d+\.\d+\.\d+(?:-(?:alpha|beta|rc)\.\d+)?)$') {
+            throw "Unsupported release tag '$tag'. Use vMAJOR.MINOR.PATCH with an optional alpha.N, beta.N, or rc.N suffix."
           }
 
           $version = $Matches.version
@@ -70,11 +70,29 @@ jobs:
 
       - name: Publish application
         shell: pwsh
-        run: .\scripts\Publish-Application.ps1 -AppVersion '${{ steps.version.outputs.value }}'
+        env:
+          LOXTOOLS_UPDATE_PUBLISHER: ${{ vars.LOXTOOLS_UPDATE_PUBLISHER }}
+        run: .\scripts\Publish-Application.ps1 -AppVersion '${{ steps.version.outputs.value }}' -UpdatePublisher $env:LOXTOOLS_UPDATE_PUBLISHER
+
+      - name: Sign application when configured
+        shell: pwsh
+        env:
+          LOXTOOLS_SIGNING_PFX_BASE64: ${{ secrets.LOXTOOLS_SIGNING_PFX_BASE64 }}
+          LOXTOOLS_SIGNING_PFX_PASSWORD: ${{ secrets.LOXTOOLS_SIGNING_PFX_PASSWORD }}
+          LOXTOOLS_UPDATE_PUBLISHER: ${{ vars.LOXTOOLS_UPDATE_PUBLISHER }}
+        run: .\scripts\Sign-WindowsFile.ps1 -FilePath 'artifacts/installer-input/LoxTools.exe' -ExpectedPublisher $env:LOXTOOLS_UPDATE_PUBLISHER
 
       - name: Compile installer
         shell: pwsh
         run: .\scripts\Build-Installer.ps1 -AppVersion '${{ steps.version.outputs.value }}' -SkipPublish
+
+      - name: Sign installer when configured
+        shell: pwsh
+        env:
+          LOXTOOLS_SIGNING_PFX_BASE64: ${{ secrets.LOXTOOLS_SIGNING_PFX_BASE64 }}
+          LOXTOOLS_SIGNING_PFX_PASSWORD: ${{ secrets.LOXTOOLS_SIGNING_PFX_PASSWORD }}
+          LOXTOOLS_UPDATE_PUBLISHER: ${{ vars.LOXTOOLS_UPDATE_PUBLISHER }}
+        run: .\scripts\Sign-WindowsFile.ps1 -FilePath 'artifacts/installer/LoxTools-Setup-${{ steps.version.outputs.value }}.exe' -ExpectedPublisher $env:LOXTOOLS_UPDATE_PUBLISHER
 
       - name: Package portable build and checksums
         shell: pwsh
