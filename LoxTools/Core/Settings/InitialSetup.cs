@@ -71,6 +71,10 @@ namespace LoxTools.Core.Settings {
         }
 
         private static void RunFirstRunSetup(RegistryKey key) {
+            // Persist the pending UI step before setting the one-time setup marker.
+            // A restart during initialization can then resume the introduction.
+            Properties.Settings.Default.InitialSettingsPending = true;
+            Properties.Settings.Default.Save();
             setRegistryEntries(key);
             setDefaultPaths();
             setDefaultAdvancedSettings();

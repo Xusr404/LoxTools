@@ -3,6 +3,29 @@
                     xmlns:sys="clr-namespace:System;assembly=mscorlib"
                     xmlns:ui="clr-namespace:LoxTools.UI.Converters;assembly=LoxTools">
 
+    <!-- Shared utility-window layout and interaction resources. -->
+    <Thickness x:Key="SectionHeadingMargin">0,0,0,12</Thickness>
+    <Thickness x:Key="SectionGap">0,0,0,14</Thickness>
+    <Thickness x:Key="InlineContentMargin">0,0,16,0</Thickness>
+    <Thickness x:Key="SelectorPreferenceMargin">0,12,0,0</Thickness>
+    <Thickness x:Key="QuietLinkPadding">0,4</Thickness>
+    <Thickness x:Key="UtilityFocusThickness">2</Thickness>
+    <Thickness x:Key="UtilityRowSeparatorThickness">0,0,0,1</Thickness>
+    <Thickness x:Key="UtilityRowPadding">14,8,8,8</Thickness>
+    <CornerRadius x:Key="UtilityControlRadius">6</CornerRadius>
+    <CornerRadius x:Key="FooterButtonCornerRadius">14</CornerRadius>
+    <sys:Double x:Key="UtilitySelectionWidth">3</sys:Double>
+    <sys:Double x:Key="UtilityDisabledOpacity">0.45</sys:Double>
+    <sys:Double x:Key="SettingsWindowHeight">720</sys:Double>
+    <sys:Double x:Key="SettingsWindowMinWidth">760</sys:Double>
+    <SolidColorBrush x:Key="BrushPrimaryActionText" Color="#102015"/>
+    <SolidColorBrush x:Key="BrushPrimaryActionHover" Color="#80DF90"/>
+    <SolidColorBrush x:Key="BrushPrimaryActionPressed" Color="#51B963"/>
+    <sys:Double x:Key="UtilityFolderIconSize">18</sys:Double>
+    <Thickness x:Key="UtilityFolderIconMargin">0,0,12,0</Thickness>
+    <Geometry x:Key="UtilityFolderGeometry">M2,4 L9,4 L12,7 L22,7 L22,20 L2,20 Z</Geometry>
+    <sys:Double x:Key="UtilityIconStrokeThickness">1.5</sys:Double>
+
     <!-- Typography -->
     <sys:Double x:Key="FsTitle">22</sys:Double>
     <sys:Double x:Key="FsSection">17.5</sys:Double>
@@ -78,7 +101,7 @@
     </Style>
 
     <!-- Default Button -->
-    <Style TargetType="Button">
+    <Style x:Key="AppButtonStyle" TargetType="Button">
         <Setter Property="FontSize" Value="{StaticResource FsLabel}"/>
         <Setter Property="Foreground" Value="{StaticResource BrushPrimary}"/>
         <Setter Property="Padding" Value="14,9"/>
@@ -115,6 +138,8 @@
             </Setter.Value>
         </Setter>
     </Style>
+
+    <Style TargetType="Button" BasedOn="{StaticResource AppButtonStyle}"/>
 
     <Style x:Key="WarningButtonStyle"
            TargetType="Button"
@@ -172,7 +197,7 @@
                             Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="14"
+                            CornerRadius="{DynamicResource FooterButtonCornerRadius}"
                             Padding="{TemplateBinding Padding}">
                         <ContentPresenter HorizontalAlignment="Center"
                                           VerticalAlignment="Center"/>
@@ -744,4 +769,370 @@
 
     <!-- Apply modern scrollbar everywhere -->
     <Style TargetType="ScrollBar" BasedOn="{StaticResource ModernScrollBarStyle}"/>
+
+    <!-- Tray onboarding -->
+    <FontFamily x:Key="AppFontFamily">Segoe UI</FontFamily>
+    <sys:Double x:Key="OnboardingWindowWidth">760</sys:Double>
+    <sys:Double x:Key="OnboardingWindowHeight">752</sys:Double>
+    <sys:Double x:Key="OnboardingHeaderIconSize">64</sys:Double>
+    <sys:Double x:Key="OnboardingHeaderIconCornerRadius">12</sys:Double>
+    <sys:Double x:Key="OnboardingHeaderMaxWidth">560</sys:Double>
+    <sys:Double x:Key="OnboardingCloseButtonSize">34</sys:Double>
+    <sys:Double x:Key="OnboardingCloseIconSize">12</sys:Double>
+    <sys:Double x:Key="OnboardingCloseIconStroke">1.8</sys:Double>
+    <sys:Double x:Key="OnboardingVisualHeight">246</sys:Double>
+    <sys:Double x:Key="OnboardingVisualInnerWidth">696</sys:Double>
+    <sys:Double x:Key="OnboardingVisualCanvasHeight">246</sys:Double>
+    <sys:Double x:Key="OnboardingAmbientGlowSize">330</sys:Double>
+    <sys:Double x:Key="OnboardingAmbientGlowLeft">240</sys:Double>
+    <sys:Double x:Key="OnboardingAmbientGlowTop">-126</sys:Double>
+    <sys:Double x:Key="OnboardingWallpaperGlowSize">250</sys:Double>
+    <sys:Double x:Key="OnboardingWallpaperGlowLeft">-62</sys:Double>
+    <sys:Double x:Key="OnboardingWallpaperGlowTop">34</sys:Double>
+    <sys:Double x:Key="OnboardingFlyoutWidth">230</sys:Double>
+    <sys:Double x:Key="OnboardingFlyoutHeight">98</sys:Double>
+    <sys:Double x:Key="OnboardingFlyoutLeft">250</sys:Double>
+    <sys:Double x:Key="OnboardingFlyoutTop">50</sys:Double>
+    <sys:Double x:Key="OnboardingFlyoutPointerLeft">350</sys:Double>
+    <sys:Double x:Key="OnboardingFlyoutPointerTop">146</sys:Double>
+    <sys:Double x:Key="OnboardingDragGuideThickness">2.2</sys:Double>
+    <sys:Double x:Key="OnboardingDragArrowHeadLeft">440</sys:Double>
+    <sys:Double x:Key="OnboardingDragArrowHeadTop">166</sys:Double>
+    <sys:Double x:Key="OnboardingTaskbarWidth">696</sys:Double>
+    <sys:Double x:Key="OnboardingTaskbarHeight">68</sys:Double>
+    <sys:Double x:Key="OnboardingTaskbarLeft">0</sys:Double>
+    <sys:Double x:Key="OnboardingTaskbarBottom">0</sys:Double>
+    <sys:Double x:Key="OnboardingTrayIconSize">21</sys:Double>
+    <sys:Double x:Key="OnboardingTrayIconStroke">1.7</sys:Double>
+    <sys:Double x:Key="OnboardingDropSlotWidth">122</sys:Double>
+    <sys:Double x:Key="OnboardingDropSlotHeight">52</sys:Double>
+    <sys:Double x:Key="OnboardingStepNumberSize">34</sys:Double>
+    <sys:Double x:Key="OnboardingMarkerSize">32</sys:Double>
+    <sys:Double x:Key="OnboardingStepOneMarkerLeft">318</sys:Double>
+    <sys:Double x:Key="OnboardingStepOneMarkerTop">188</sys:Double>
+    <sys:Double x:Key="OnboardingStepTwoMarkerLeft">232</sys:Double>
+    <sys:Double x:Key="OnboardingStepTwoMarkerTop">64</sys:Double>
+    <sys:Double x:Key="OnboardingFlyoutAppIconSize">48</sys:Double>
+    <sys:Double x:Key="FsOnboardingTitle">26</sys:Double>
+    <sys:Double x:Key="FsOnboardingEyebrow">11</sys:Double>
+    <sys:Double x:Key="FsOnboardingBody">14</sys:Double>
+    <sys:Double x:Key="FsOnboardingStepTitle">13.5</sys:Double>
+    <sys:Double x:Key="FsOnboardingStepBody">12.5</sys:Double>
+    <sys:Double x:Key="FsOnboardingClock">11</sys:Double>
+    <Thickness x:Key="OnboardingWindowSurfaceMargin">0,32,0,0</Thickness>
+    <Thickness x:Key="OnboardingWindowPadding">30,44,30,30</Thickness>
+    <Thickness x:Key="OnboardingHeaderIconMargin">0,0,0,0</Thickness>
+    <Thickness x:Key="OnboardingDescriptionMargin">0,14,0,20</Thickness>
+    <Thickness x:Key="OnboardingVisualPadding">0</Thickness>
+    <Thickness x:Key="OnboardingFlyoutPadding">14</Thickness>
+    <Thickness x:Key="OnboardingFlyoutIconsMargin">24,0,24,0</Thickness>
+    <Thickness x:Key="OnboardingFlyoutAppIconPadding">6</Thickness>
+    <Thickness x:Key="OnboardingTaskbarItemsMargin">0,0,16,0</Thickness>
+    <Thickness x:Key="OnboardingTaskbarItemMargin">0,0,12,0</Thickness>
+    <Thickness x:Key="OnboardingClockMargin">2,0,14,0</Thickness>
+    <Thickness x:Key="OnboardingBellMargin">0,0,0,0</Thickness>
+    <Thickness x:Key="OnboardingStepsMargin">0,22,0,0</Thickness>
+    <Thickness x:Key="OnboardingStepRowPadding">18,16,18,16</Thickness>
+    <Thickness x:Key="OnboardingStepTextMargin">14,0,0,0</Thickness>
+    <Thickness x:Key="OnboardingHintMargin">0,16,0,0</Thickness>
+    <Thickness x:Key="OnboardingFooterMargin">0,16,0,0</Thickness>
+    <Thickness x:Key="SettingsInlineRowSeparatorMargin">0,14</Thickness>
+    <Thickness x:Key="SettingsInlineActionContentMargin">0,0,16,0</Thickness>
+    <Thickness x:Key="SettingsInlineActionHintMargin">0,2,0,0</Thickness>
+    <CornerRadius x:Key="OnboardingWindowCornerRadius">22</CornerRadius>
+    <CornerRadius x:Key="OnboardingVisualCornerRadius">16</CornerRadius>
+    <CornerRadius x:Key="OnboardingFlyoutCornerRadius">12</CornerRadius>
+    <CornerRadius x:Key="OnboardingSmallCornerRadius">9</CornerRadius>
+    <CornerRadius x:Key="OnboardingStepNumberCornerRadius">17</CornerRadius>
+    <CornerRadius x:Key="OnboardingMarkerCornerRadius">16</CornerRadius>
+    <CornerRadius x:Key="OnboardingTaskbarCornerRadius">0,0,14,14</CornerRadius>
+    <Rect x:Key="OnboardingHeaderIconClipRect">0,0,64,64</Rect>
+    <DoubleCollection x:Key="OnboardingDragGuideDashArray">8 4</DoubleCollection>
+    <Geometry x:Key="CloseGeometry">M1,1 L11,11 M11,1 L1,11</Geometry>
+    <Geometry x:Key="MonitorGeometry">M3,5 H17 V14 H3 Z M8,17 H12 M10,14 V17</Geometry>
+    <Geometry x:Key="VolumeGeometry">M3,8 H7 L12,4 V18 L7,14 H3 Z M15,8 C17,10 17,12 15,14</Geometry>
+    <Geometry x:Key="BellGeometry">M10,18 C11.2,18 12,17.2 12,16 H8 C8,17.2 8.8,18 10,18 M5,15 H15 L14,13 V9 C14,6.8 12.2,5 10,5 C7.8,5 6,6.8 6,9 V13 Z</Geometry>
+    <Geometry x:Key="OnboardingFlyoutPointerGeometry">M0,0 L22,0 L11,12 Z</Geometry>
+    <Geometry x:Key="OnboardingWallpaperWaveGeometry">M-12,116 C84,44 158,96 246,44 C328,-5 424,12 506,66 C574,109 646,76 720,32 L720,0 L-12,0 Z</Geometry>
+    <Geometry x:Key="OnboardingDragPathGeometry">M336,118 C372,126 420,146 454,175</Geometry>
+    <Geometry x:Key="OnboardingDragArrowHeadGeometry">M0,0 L15,9 L1,18 L5,10 Z</Geometry>
+
+    <LinearGradientBrush x:Key="OnboardingSurfaceBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#FF1A211E" Offset="0"/>
+        <GradientStop Color="#FF131816" Offset="1"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="OnboardingVisualBackgroundBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#DC15201C" Offset="0"/>
+        <GradientStop Color="#D80D1311" Offset="1"/>
+    </LinearGradientBrush>
+    <RadialGradientBrush x:Key="OnboardingAmbientGlowBrush">
+        <GradientStop Color="#3267D37A" Offset="0"/>
+        <GradientStop Color="#0067D37A" Offset="1"/>
+    </RadialGradientBrush>
+    <RadialGradientBrush x:Key="OnboardingWallpaperGlowBrush">
+        <GradientStop Color="#284C7A8E" Offset="0"/>
+        <GradientStop Color="#004C7A8E" Offset="1"/>
+    </RadialGradientBrush>
+    <LinearGradientBrush x:Key="OnboardingWallpaperWaveBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#1E75A38C" Offset="0"/>
+        <GradientStop Color="#142B3F48" Offset="0.55"/>
+        <GradientStop Color="#00101311" Offset="1"/>
+    </LinearGradientBrush>
+    <SolidColorBrush x:Key="OnboardingTaskbarBrush" Color="#EF0B1722"/>
+    <SolidColorBrush x:Key="OnboardingTaskbarTopHighlightBrush" Color="#24FFFFFF"/>
+    <SolidColorBrush x:Key="OnboardingFlyoutBrush" Color="#F0242B28"/>
+    <SolidColorBrush x:Key="OnboardingFlyoutBorderBrush" Color="#42FFFFFF"/>
+    <SolidColorBrush x:Key="OnboardingDragGuideBrush" Color="#E667D37A"/>
+    <SolidColorBrush x:Key="OnboardingDropSlotBrush" Color="#1867D37A"/>
+    <SolidColorBrush x:Key="OnboardingDropSlotBorderBrush" Color="#B067D37A"/>
+    <SolidColorBrush x:Key="OnboardingCloseHoverBrush" Color="#22FFFFFF"/>
+    <SolidColorBrush x:Key="OnboardingStepContainerBrush" Color="#1467D37A"/>
+    <SolidColorBrush x:Key="OnboardingStepDividerBrush" Color="#2467D37A"/>
+    <SolidColorBrush x:Key="OnboardingStepNumberBrush" Color="#E667D37A"/>
+    <SolidColorBrush x:Key="OnboardingStepNumberBorderBrush" Color="#FF67D37A"/>
+    <SolidColorBrush x:Key="OnboardingBadgeTextBrush" Color="#FFFFFFFF"/>
+    <SolidColorBrush x:Key="OnboardingTaskbarAppBrush" Color="#22FFFFFF"/>
+    <SolidColorBrush x:Key="OnboardingSecondaryIconBrush" Color="#4087A0B5"/>
+    <DropShadowEffect x:Key="OnboardingFlyoutShadow"
+                      Color="#D0000000"
+                      BlurRadius="18"
+                      ShadowDepth="8"
+                      Opacity="0.45"/>
+
+    <DropShadowEffect x:Key="OnboardingWindowShadow"
+                      Color="#C0000000"
+                      BlurRadius="28"
+                      ShadowDepth="8"
+                      Opacity="0.7"/>
+
+    <Style x:Key="OnboardingWindowSurfaceStyle" TargetType="Border">
+        <Setter Property="CornerRadius" Value="{StaticResource OnboardingWindowCornerRadius}"/>
+        <Setter Property="Background" Value="{DynamicResource OnboardingSurfaceBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BrushCardBorder}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Padding" Value="{StaticResource OnboardingWindowPadding}"/>
+        <Setter Property="Effect" Value="{StaticResource OnboardingWindowShadow}"/>
+    </Style>
+
+    <Style x:Key="OnboardingEyebrowTextStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="{StaticResource FsOnboardingEyebrow}"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Foreground" Value="{DynamicResource BrushAccent}"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="TextAlignment" Value="Center"/>
+    </Style>
+
+    <Style x:Key="OnboardingTitleTextStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="{StaticResource FsOnboardingTitle}"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Foreground" Value="{DynamicResource BrushPrimary}"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="TextAlignment" Value="Center"/>
+    </Style>
+
+    <Style x:Key="OnboardingBodyTextStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="{StaticResource FsOnboardingBody}"/>
+        <Setter Property="Foreground" Value="{DynamicResource BrushSecondary}"/>
+        <Setter Property="TextWrapping" Value="Wrap"/>
+        <Setter Property="LineHeight" Value="21"/>
+    </Style>
+
+    <Style x:Key="OnboardingCloseButtonStyle" TargetType="Button">
+        <Setter Property="Width" Value="{StaticResource OnboardingCloseButtonSize}"/>
+        <Setter Property="Height" Value="{StaticResource OnboardingCloseButtonSize}"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="Foreground" Value="{DynamicResource BrushSecondary}"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="CloseSurface"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="{StaticResource OnboardingSmallCornerRadius}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="CloseSurface" Property="Background" Value="{DynamicResource OnboardingCloseHoverBrush}"/>
+                            <Setter Property="Foreground" Value="{DynamicResource BrushPrimary}"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="CloseSurface" Property="Opacity" Value="0.72"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="OnboardingVisualStyle" TargetType="Border">
+        <Setter Property="Height" Value="{StaticResource OnboardingVisualHeight}"/>
+        <Setter Property="CornerRadius" Value="{StaticResource OnboardingVisualCornerRadius}"/>
+        <Setter Property="Background" Value="{DynamicResource OnboardingVisualBackgroundBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BrushCardBorder}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Padding" Value="{StaticResource OnboardingVisualPadding}"/>
+        <Setter Property="ClipToBounds" Value="True"/>
+    </Style>
+
+    <Style x:Key="OnboardingFlyoutStyle" TargetType="Border">
+        <Setter Property="CornerRadius" Value="{StaticResource OnboardingFlyoutCornerRadius}"/>
+        <Setter Property="Background" Value="{DynamicResource OnboardingFlyoutBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource OnboardingFlyoutBorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Padding" Value="{StaticResource OnboardingFlyoutPadding}"/>
+        <Setter Property="Effect" Value="{StaticResource OnboardingFlyoutShadow}"/>
+    </Style>
+
+    <Style x:Key="OnboardingFlyoutAppIconStyle" TargetType="Border">
+        <Setter Property="Width" Value="{StaticResource OnboardingFlyoutAppIconSize}"/>
+        <Setter Property="Height" Value="{StaticResource OnboardingFlyoutAppIconSize}"/>
+        <Setter Property="Padding" Value="{StaticResource OnboardingFlyoutAppIconPadding}"/>
+        <Setter Property="CornerRadius" Value="{StaticResource OnboardingSmallCornerRadius}"/>
+        <Setter Property="Background" Value="{DynamicResource BrushAccentBg}"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+
+    <Style x:Key="OnboardingFlyoutSecondaryIconStyle" TargetType="Border">
+        <Setter Property="Width" Value="{StaticResource OnboardingFlyoutAppIconSize}"/>
+        <Setter Property="Height" Value="{StaticResource OnboardingFlyoutAppIconSize}"/>
+        <Setter Property="Padding" Value="8"/>
+        <Setter Property="CornerRadius" Value="{StaticResource OnboardingSmallCornerRadius}"/>
+        <Setter Property="Background" Value="{DynamicResource OnboardingTaskbarAppBrush}"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+
+    <Style x:Key="OnboardingSecondaryIconDotStyle" TargetType="Ellipse">
+        <Setter Property="Width" Value="7"/>
+        <Setter Property="Height" Value="7"/>
+        <Setter Property="Fill" Value="{DynamicResource OnboardingSecondaryIconBrush}"/>
+        <Setter Property="Margin" Value="1.5"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+
+    <Style x:Key="OnboardingTaskbarStyle" TargetType="Border">
+        <Setter Property="CornerRadius" Value="{StaticResource OnboardingTaskbarCornerRadius}"/>
+        <Setter Property="Background" Value="{DynamicResource OnboardingTaskbarBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BrushCardBorder}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+    </Style>
+
+    <Style x:Key="OnboardingTaskbarHighlightStyle" TargetType="Border">
+        <Setter Property="Height" Value="1"/>
+        <Setter Property="Margin" Value="24,1,24,0"/>
+        <Setter Property="VerticalAlignment" Value="Top"/>
+        <Setter Property="Background" Value="{DynamicResource OnboardingTaskbarTopHighlightBrush}"/>
+        <Setter Property="CornerRadius" Value="1"/>
+    </Style>
+
+    <Style x:Key="OnboardingChevronHitStyle" TargetType="Border">
+        <Setter Property="Width" Value="48"/>
+        <Setter Property="Height" Value="48"/>
+        <Setter Property="CornerRadius" Value="14"/>
+        <Setter Property="Background" Value="#18FFFFFF"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BrushAccentBorder}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+    </Style>
+
+    <Style x:Key="OnboardingTrayGlyphTextStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="26"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Foreground" Value="{DynamicResource BrushPrimary}"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="LineHeight" Value="26"/>
+    </Style>
+
+    <Style x:Key="OnboardingDropSlotShapeStyle" TargetType="Rectangle">
+        <Setter Property="RadiusX" Value="13"/>
+        <Setter Property="RadiusY" Value="13"/>
+        <Setter Property="Fill" Value="{DynamicResource OnboardingDropSlotBrush}"/>
+        <Setter Property="Stroke" Value="{DynamicResource OnboardingDropSlotBorderBrush}"/>
+        <Setter Property="StrokeThickness" Value="1.6"/>
+        <Setter Property="StrokeDashArray" Value="6 6"/>
+    </Style>
+
+    <Style x:Key="OnboardingDropHereTextStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="11"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Foreground" Value="{DynamicResource BrushAccent}"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+
+    <Style x:Key="OnboardingClockTextStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="{StaticResource FsOnboardingClock}"/>
+        <Setter Property="Foreground" Value="{DynamicResource BrushSecondary}"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="HorizontalAlignment" Value="Right"/>
+        <Setter Property="LineHeight" Value="12"/>
+    </Style>
+
+    <Style x:Key="OnboardingMarkerStyle" TargetType="Border">
+        <Setter Property="CornerRadius" Value="{StaticResource OnboardingMarkerCornerRadius}"/>
+        <Setter Property="Background" Value="{DynamicResource OnboardingStepNumberBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource OnboardingStepNumberBorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+    </Style>
+
+    <Style x:Key="OnboardingMarkerTextStyle" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource OnboardingBadgeTextBrush}"/>
+        <Setter Property="FontSize" Value="{StaticResource FsSecondary}"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+
+    <Style x:Key="OnboardingStepsContainerStyle" TargetType="Border">
+        <Setter Property="CornerRadius" Value="{StaticResource OnboardingFlyoutCornerRadius}"/>
+        <Setter Property="Background" Value="{DynamicResource OnboardingStepContainerBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BrushAccentBorder}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+    </Style>
+
+    <Style x:Key="OnboardingStepDividerStyle" TargetType="Border">
+        <Setter Property="Height" Value="1"/>
+        <Setter Property="Background" Value="{DynamicResource OnboardingStepDividerBrush}"/>
+        <Setter Property="Margin" Value="18,0"/>
+    </Style>
+
+    <Style x:Key="OnboardingStepNumberStyle" TargetType="Border">
+        <Setter Property="Width" Value="{StaticResource OnboardingStepNumberSize}"/>
+        <Setter Property="Height" Value="{StaticResource OnboardingStepNumberSize}"/>
+        <Setter Property="CornerRadius" Value="{StaticResource OnboardingStepNumberCornerRadius}"/>
+        <Setter Property="Background" Value="{DynamicResource OnboardingStepNumberBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource OnboardingStepNumberBorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+    </Style>
+
+    <Style x:Key="OnboardingStepNumberTextStyle" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource OnboardingBadgeTextBrush}"/>
+        <Setter Property="FontSize" Value="{StaticResource FsLabel}"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+
+    <Style x:Key="OnboardingStepTitleStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="{StaticResource FsOnboardingStepTitle}"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Foreground" Value="{DynamicResource BrushPrimary}"/>
+    </Style>
+
+    <Style x:Key="OnboardingStepDescriptionStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="{StaticResource FsOnboardingStepBody}"/>
+        <Setter Property="Foreground" Value="{DynamicResource BrushSecondary}"/>
+        <Setter Property="TextWrapping" Value="Wrap"/>
+        <Setter Property="Margin" Value="0,3,0,0"/>
+    </Style>
+
+    <Style x:Key="OnboardingHintTextStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="{StaticResource FsSecondary}"/>
+        <Setter Property="Foreground" Value="{DynamicResource BrushSecondary}"/>
+        <Setter Property="TextWrapping" Value="Wrap"/>
+    </Style>
 </ResourceDictionary>

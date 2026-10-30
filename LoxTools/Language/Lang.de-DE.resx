@@ -298,7 +298,7 @@
     <value>LoxoneConfig konnte nicht gestartet werden!\nFehler: {0}</value>
   </data>
   <data name="LaunchModeTitle" xml:space="preserve">
-    <value>Startmodus</value>
+    <value>Startverhalten</value>
   </data>
   <data name="LaunchModeHint" xml:space="preserve">
     <value>Wähle, ob automatisch die neueste Version oder eine feste Standardversion verwendet wird.</value>
@@ -316,13 +316,13 @@
     <value>Aktuellste installierte Version:</value>
   </data>
   <data name="UseLatestVersionOptionTitle" xml:space="preserve">
-    <value>Immer neueste Version verwenden (empfohlen)</value>
+    <value>Automatisch — neueste Version</value>
   </data>
   <data name="UseLatestVersionOptionHint" xml:space="preserve">
     <value>Startet automatisch mit der neuesten installierten Version.</value>
   </data>
   <data name="UseFixedVersionOptionTitle" xml:space="preserve">
-    <value>Feste Version verwenden</value>
+    <value>Manuell — feste Version</value>
   </data>
   <data name="UseFixedVersionOptionHint" xml:space="preserve">
     <value>Standardversion manuell auswählen.</value>
@@ -334,7 +334,7 @@
     <value>Beim Start immer die neueste installierte Version verwenden.</value>
   </data>
   <data name="VersionSelectorTitle" xml:space="preserve">
-    <value>VersionSelector</value>
+    <value>Version auswählen</value>
   </data>
   <data name="WindowsAutostartup" xml:space="preserve">
     <value>Windows Autostartup</value>
@@ -426,4 +426,38 @@
   <data name="AppUpdate_UpdateNow" xml:space="preserve"><value>Jetzt aktualisieren</value></data>
   <data name="AppUpdate_NotificationTitle" xml:space="preserve"><value>LoxTools-Update verfügbar</value></data>
   <data name="AppUpdate_NotificationText" xml:space="preserve"><value>Version {0} ist verfügbar. Zum Aktualisieren klicken.</value></data>
+  <data name="TrayOnboarding_WindowTitle" xml:space="preserve"><value>Kurztipp</value></data>
+  <data name="TrayOnboarding_Title" xml:space="preserve"><value>LoxTools sichtbar halten</value></data>
+  <data name="TrayOnboarding_Description" xml:space="preserve"><value>LoxTools läuft im Windows-Infobereich. Wenn Windows das Symbol ausblendet, hefte es für schnelleren Zugriff an den sichtbaren Infobereich an.</value></data>
+  <data name="TrayOnboarding_HiddenIconsLabel" xml:space="preserve"><value>Ausgeblendete Symbole</value></data>
+  <data name="TrayOnboarding_StepOneTitle" xml:space="preserve"><value>Pfeil für ausgeblendete Symbole anklicken</value></data>
+  <data name="TrayOnboarding_StepOneDescription" xml:space="preserve"><value>Öffne das Menü für ausgeblendete Symbole unten rechts in der Windows-Taskleiste.</value></data>
+  <data name="TrayOnboarding_StepTwoTitle" xml:space="preserve"><value>LoxTools in den Infobereich ziehen</value></data>
+  <data name="TrayOnboarding_StepTwoDescription" xml:space="preserve"><value>Lege das LoxTools-Symbol im sichtbaren Infobereich ab, um schneller darauf zuzugreifen.</value></data>
+  <data name="TrayOnboarding_ReopenHint" xml:space="preserve"><value>Diese Anleitung kannst du über die Einstellungen oder das Tray-Menü erneut öffnen.</value></data>
+  <data name="TrayOnboarding_Done" xml:space="preserve"><value>Verstanden</value></data>
+  <data name="TrayOnboarding_Close" xml:space="preserve"><value>Schließen</value></data>
+  <data name="TrayOnboarding_IllustrationDescription" xml:space="preserve"><value>Illustration, die das LoxTools-Symbol von den ausgeblendeten Symbolen in den sichtbaren Infobereich bewegt.</value></data>
+  <data name="TrayOnboarding_DropHere" xml:space="preserve"><value>Hier ablegen</value></data>
+  <data name="TrayOnboarding_Menu" xml:space="preserve"><value>Hilfe zum Tray-Symbol</value></data>
+  <data name="TrayOnboarding_SettingsTitle" xml:space="preserve"><value>Zugriff über den Infobereich</value></data>
+  <data name="TrayOnboarding_SettingsHint" xml:space="preserve"><value>Zeigt, wie das LoxTools-Symbol neben der Uhr sichtbar bleibt.</value></data>
+  <data name="TrayOnboarding_SettingsButton" xml:space="preserve"><value>Anleitung anzeigen</value></data>
+  <data name="UpdateCheck_Cancelled" xml:space="preserve"><value>Download abgebrochen — zum Wiederholen klicken</value></data>
+  <data name="UpdateCheck_Installing" xml:space="preserve"><value>Installation läuft…</value></data>
+  <data name="UpdateCheck_Installed" xml:space="preserve"><value>Installation abgeschlossen</value></data>
+  <data name="UpdateCheck_Extracting" xml:space="preserve"><value>Installationsdatei wird entpackt…</value></data>
+  <data name="UpdateCheck_DownloadProgress" xml:space="preserve"><value>Download {0}% {1} — Zum Abbrechen Klicken</value></data>
+  <data name="UpdateCheck_CancellingInstaller" xml:space="preserve"><value>Abbruch angefordert — Installer wird beendet</value></data>
+  <data name="UpdateCheck_InstallationCancelled" xml:space="preserve"><value>Installation abgebrochen — zum Wiederholen klicken</value></data>
+  <data name="LoxoneAppNotInstalled" xml:space="preserve"><value>Loxone App ist nicht installiert.</value></data>
+  <data name="InstallationFoldersTitle" xml:space="preserve"><value>Installationsordner</value></data>
+  <data name="InstallationFoldersHint" xml:space="preserve"><value>Eine Installation pro Kanal ersetzt die Installation dieses Kanals. Versionsordner behalten jede Version separat. Neue Installationen verwenden den ersten Installationspfad oben oder den Standardordner von Loxone, wenn kein Pfad konfiguriert ist.</value></data>
+  <data name="InstallationFoldersVersioned" xml:space="preserve"><value>Jede Version behalten (z. B. LoxoneConfig_17031027_Beta)</value></data>
+  <data name="InstallationFoldersSingle" xml:space="preserve"><value>Eine Installation pro Kanal (z. B. LoxoneConfig_Beta)</value></data>
+  <data name="SettingsStartupTray" xml:space="preserve"><value>Start &amp; Infobereich</value></data>
+  <data name="SettingsInstallationsProjects" xml:space="preserve"><value>Installationen &amp; Projekte</value></data>
+  <data name="SettingsMore" xml:space="preserve"><value>Weitere Einstellungen</value></data>
+  <data name="SettingsAddFolder" xml:space="preserve"><value>Ordner hinzufügen…</value></data>
+  <data name="TrayOnboarding_DoneOpenSettings" xml:space="preserve"><value>Verstanden — Einstellungen öffnen</value></data>
 </root>

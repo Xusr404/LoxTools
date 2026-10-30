@@ -19,6 +19,19 @@ namespace LoxTools.Tests {
             }
         }
 
+        [TestMethod]
+        public void ExtractionCollisionPreservesExistingInstaller() {
+            using (var temp = new TemporaryDirectory()) {
+                string archive = CreateArchive(temp.Path, (UpdateSecurityPolicy.InstallerFileName, new byte[] { 1 }));
+                string output = Path.Combine(temp.Path, "out");
+                Directory.CreateDirectory(output);
+                string installer = Path.Combine(output, UpdateSecurityPolicy.InstallerFileName);
+                File.WriteAllText(installer, "previous installer");
+                Assert.ThrowsException<UpdateSecurityException>(() => new SecureInstallerExtractor().Extract(archive, output));
+                Assert.AreEqual("previous installer", File.ReadAllText(installer));
+            }
+        }
+
         [DataTestMethod]
         [DataRow("../LoxoneConfigSetup.exe")]
         [DataRow("folder/LoxoneConfigSetup.exe")]

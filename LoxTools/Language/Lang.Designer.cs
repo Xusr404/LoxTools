@@ -799,6 +799,24 @@ namespace LoxTools.Language {
         internal static string AppUpdate_UpdateNow => ResourceManager.GetString("AppUpdate_UpdateNow", resourceCulture);
         internal static string AppUpdate_NotificationTitle => ResourceManager.GetString("AppUpdate_NotificationTitle", resourceCulture);
         internal static string AppUpdate_NotificationText => ResourceManager.GetString("AppUpdate_NotificationText", resourceCulture);
+        internal static string TrayOnboarding_WindowTitle => ResourceManager.GetString("TrayOnboarding_WindowTitle", resourceCulture);
+        internal static string TrayOnboarding_Title => ResourceManager.GetString("TrayOnboarding_Title", resourceCulture);
+        internal static string TrayOnboarding_Description => ResourceManager.GetString("TrayOnboarding_Description", resourceCulture);
+        internal static string TrayOnboarding_HiddenIconsLabel => ResourceManager.GetString("TrayOnboarding_HiddenIconsLabel", resourceCulture);
+        internal static string TrayOnboarding_StepOneTitle => ResourceManager.GetString("TrayOnboarding_StepOneTitle", resourceCulture);
+        internal static string TrayOnboarding_StepOneDescription => ResourceManager.GetString("TrayOnboarding_StepOneDescription", resourceCulture);
+        internal static string TrayOnboarding_StepTwoTitle => ResourceManager.GetString("TrayOnboarding_StepTwoTitle", resourceCulture);
+        internal static string TrayOnboarding_StepTwoDescription => ResourceManager.GetString("TrayOnboarding_StepTwoDescription", resourceCulture);
+        internal static string TrayOnboarding_ReopenHint => ResourceManager.GetString("TrayOnboarding_ReopenHint", resourceCulture);
+        internal static string TrayOnboarding_Done => ResourceManager.GetString("TrayOnboarding_Done", resourceCulture);
+        internal static string TrayOnboarding_DoneOpenSettings => ResourceManager.GetString("TrayOnboarding_DoneOpenSettings", resourceCulture);
+        internal static string TrayOnboarding_Close => ResourceManager.GetString("TrayOnboarding_Close", resourceCulture);
+        internal static string TrayOnboarding_IllustrationDescription => ResourceManager.GetString("TrayOnboarding_IllustrationDescription", resourceCulture);
+        internal static string TrayOnboarding_DropHere => ResourceManager.GetString("TrayOnboarding_DropHere", resourceCulture);
+        internal static string TrayOnboarding_Menu => ResourceManager.GetString("TrayOnboarding_Menu", resourceCulture);
+        internal static string TrayOnboarding_SettingsTitle => ResourceManager.GetString("TrayOnboarding_SettingsTitle", resourceCulture);
+        internal static string TrayOnboarding_SettingsHint => ResourceManager.GetString("TrayOnboarding_SettingsHint", resourceCulture);
+        internal static string TrayOnboarding_SettingsButton => ResourceManager.GetString("TrayOnboarding_SettingsButton", resourceCulture);
 
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die VersionSelector ähnelt.
@@ -812,10 +830,26 @@ namespace LoxTools.Language {
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Windows Autostartup ähnelt.
         /// </summary>
+        internal static string UpdateCheck_Cancelled => ResourceManager.GetString("UpdateCheck_Cancelled", resourceCulture);
+        internal static string InstallationFoldersTitle => ResourceManager.GetString("InstallationFoldersTitle", resourceCulture);
+        internal static string InstallationFoldersHint => ResourceManager.GetString("InstallationFoldersHint", resourceCulture);
+        internal static string InstallationFoldersVersioned => ResourceManager.GetString("InstallationFoldersVersioned", resourceCulture);
+        internal static string InstallationFoldersSingle => ResourceManager.GetString("InstallationFoldersSingle", resourceCulture);
+        internal static string LoxoneAppNotInstalled => ResourceManager.GetString("LoxoneAppNotInstalled", resourceCulture);
+        internal static string UpdateCheck_DownloadProgress => ResourceManager.GetString("UpdateCheck_DownloadProgress", resourceCulture);
+        internal static string UpdateCheck_CancellingInstaller => ResourceManager.GetString("UpdateCheck_CancellingInstaller", resourceCulture);
+        internal static string UpdateCheck_InstallationCancelled => ResourceManager.GetString("UpdateCheck_InstallationCancelled", resourceCulture);
+        internal static string UpdateCheck_Extracting => ResourceManager.GetString("UpdateCheck_Extracting", resourceCulture);
+        internal static string UpdateCheck_Installing => ResourceManager.GetString("UpdateCheck_Installing", resourceCulture);
+        internal static string UpdateCheck_Installed => ResourceManager.GetString("UpdateCheck_Installed", resourceCulture);
         internal static string WindowsAutostartup {
             get {
                 return ResourceManager.GetString("WindowsAutostartup", resourceCulture);
             }
         }
+        internal static string SettingsStartupTray => ResourceManager.GetString("SettingsStartupTray", resourceCulture);
+        internal static string SettingsInstallationsProjects => ResourceManager.GetString("SettingsInstallationsProjects", resourceCulture);
+        internal static string SettingsMore => ResourceManager.GetString("SettingsMore", resourceCulture);
+        internal static string SettingsAddFolder => ResourceManager.GetString("SettingsAddFolder", resourceCulture);
     }
 }

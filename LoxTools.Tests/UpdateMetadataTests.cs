@@ -26,7 +26,7 @@ namespace LoxTools.Tests {
 
         [DataTestMethod]
         [DataRow("zzzzzzzz", "531271265")]
-        [DataRow("deadbee", "531271265")]
+        [DataRow("deadbeeff", "531271265")]
         [DataRow("deadbeef", "")]
         [DataRow("deadbeef", "0")]
         [DataRow("deadbeef", "2147483649")]
@@ -43,6 +43,36 @@ namespace LoxTools.Tests {
             var parser = new UpdateCheckXmlParser();
 
             Assert.ThrowsException<XmlException>(() => parser.ParseRelease(xml));
+        }
+
+        [DataTestMethod]
+        [DataRow("deadbee", "0deadbee")]
+        [DataRow("0xAbC", "00000abc")]
+        [DataRow("0", "00000000")]
+        public void ParserRestoresOmittedLeadingZeros(string input, string expected) {
+            Assert.AreEqual(expected, new UpdateCheckXmlParser().ParseRelease(ValidRelease.Replace("deadbeef", input)).Crc32Hex);
+        }
+
+        [DataTestMethod]
+        [DataRow(false)]
+        [DataRow(true)]
+        public async Task MetadataNeverDowngradesAfterHttpsFailure(bool failHttps) {
+            int calls = 0;
+            using (var client = CreateClient(request => {
+                calls++;
+                Assert.AreEqual("https", request.RequestUri.Scheme);
+                return new HttpResponseMessage(failHttps ? HttpStatusCode.ServiceUnavailable : HttpStatusCode.OK) {
+                    Content = new StringContent(ValidRelease)
+                };
+            })) {
+                if (failHttps) {
+                    await Assert.ThrowsExceptionAsync<HttpRequestException>(() =>
+                        new UpdateCheckXmlClient(client).DownloadUpdateCheckXmlAsync(CancellationToken.None));
+                } else {
+                    Assert.AreEqual(ValidRelease, await new UpdateCheckXmlClient(client).DownloadUpdateCheckXmlAsync(CancellationToken.None));
+                }
+                Assert.AreEqual(1, calls);
+            }
         }
 
         [TestMethod]

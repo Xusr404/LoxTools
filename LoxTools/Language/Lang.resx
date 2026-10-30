@@ -304,7 +304,7 @@
     <value>Couldn't start LoxoneConfig!\nError: {0}</value>
   </data>
   <data name="LaunchModeTitle" xml:space="preserve">
-    <value>Launch mode</value>
+    <value>Launch behavior</value>
   </data>
   <data name="LaunchModeHint" xml:space="preserve">
     <value>Choose whether to use the newest version automatically or a fixed default version.</value>
@@ -322,13 +322,13 @@
     <value>Latest installed version:</value>
   </data>
   <data name="UseLatestVersionOptionTitle" xml:space="preserve">
-    <value>Always use newest version (recommended)</value>
+    <value>Automatic — latest version</value>
   </data>
   <data name="UseLatestVersionOptionHint" xml:space="preserve">
     <value>Automatically starts with the newest installed version.</value>
   </data>
   <data name="UseFixedVersionOptionTitle" xml:space="preserve">
-    <value>Use fixed version</value>
+    <value>Manual — fixed version</value>
   </data>
   <data name="UseFixedVersionOptionHint" xml:space="preserve">
     <value>Select the default version manually.</value>
@@ -340,7 +340,7 @@
     <value>Always start with the newest installed version.</value>
   </data>
   <data name="VersionSelectorTitle" xml:space="preserve">
-    <value>VersionSelector</value>
+    <value>Select a version</value>
   </data>
   <data name="WindowsAutostartup" xml:space="preserve">
     <value>Windows Autostartup</value>
@@ -426,4 +426,38 @@
   <data name="AppUpdate_UpdateNow" xml:space="preserve"><value>Update now</value></data>
   <data name="AppUpdate_NotificationTitle" xml:space="preserve"><value>LoxTools update available</value></data>
   <data name="AppUpdate_NotificationText" xml:space="preserve"><value>Version {0} is available. Click to update.</value></data>
+  <data name="TrayOnboarding_WindowTitle" xml:space="preserve"><value>Quick tip</value></data>
+  <data name="TrayOnboarding_Title" xml:space="preserve"><value>Keep LoxTools visible</value></data>
+  <data name="TrayOnboarding_Description" xml:space="preserve"><value>LoxTools runs in the Windows system tray. If Windows hides it, pin it to the visible tray area for quicker access.</value></data>
+  <data name="TrayOnboarding_HiddenIconsLabel" xml:space="preserve"><value>Hidden icons</value></data>
+  <data name="TrayOnboarding_StepOneTitle" xml:space="preserve"><value>Click the hidden-icons arrow</value></data>
+  <data name="TrayOnboarding_StepOneDescription" xml:space="preserve"><value>Open the hidden-icons menu in the bottom-right corner of the Windows taskbar.</value></data>
+  <data name="TrayOnboarding_StepTwoTitle" xml:space="preserve"><value>Drag LoxTools into the tray</value></data>
+  <data name="TrayOnboarding_StepTwoDescription" xml:space="preserve"><value>Drop the LoxTools icon into the visible tray area for faster access.</value></data>
+  <data name="TrayOnboarding_ReopenHint" xml:space="preserve"><value>You can reopen this guide from Settings or the tray menu.</value></data>
+  <data name="TrayOnboarding_Done" xml:space="preserve"><value>Got it</value></data>
+  <data name="TrayOnboarding_Close" xml:space="preserve"><value>Close</value></data>
+  <data name="TrayOnboarding_IllustrationDescription" xml:space="preserve"><value>Illustration showing the LoxTools icon moving from hidden icons to the visible system tray.</value></data>
+  <data name="TrayOnboarding_DropHere" xml:space="preserve"><value>Drop here</value></data>
+  <data name="TrayOnboarding_Menu" xml:space="preserve"><value>Tray icon help</value></data>
+  <data name="TrayOnboarding_SettingsTitle" xml:space="preserve"><value>System tray access</value></data>
+  <data name="TrayOnboarding_SettingsHint" xml:space="preserve"><value>See how to keep the LoxTools icon visible beside the clock.</value></data>
+  <data name="TrayOnboarding_SettingsButton" xml:space="preserve"><value>Show guide</value></data>
+  <data name="UpdateCheck_Cancelled" xml:space="preserve"><value>Download cancelled — click to retry</value></data>
+  <data name="UpdateCheck_Installing" xml:space="preserve"><value>Installing…</value></data>
+  <data name="UpdateCheck_Installed" xml:space="preserve"><value>Installation completed</value></data>
+  <data name="UpdateCheck_Extracting" xml:space="preserve"><value>Extracting installer…</value></data>
+  <data name="UpdateCheck_DownloadProgress" xml:space="preserve"><value>Downloading {0}% {1} — Click to Cancel</value></data>
+  <data name="UpdateCheck_CancellingInstaller" xml:space="preserve"><value>Cancellation requested — waiting for installer</value></data>
+  <data name="UpdateCheck_InstallationCancelled" xml:space="preserve"><value>Installation cancelled — click to retry</value></data>
+  <data name="LoxoneAppNotInstalled" xml:space="preserve"><value>Loxone App is not installed.</value></data>
+  <data name="InstallationFoldersTitle" xml:space="preserve"><value>Installation folders</value></data>
+  <data name="InstallationFoldersHint" xml:space="preserve"><value>One installation per channel replaces that channel's installation. Versioned folders keep each version separately. New installations use the first installation path above, or the standard Loxone folder if none is configured.</value></data>
+  <data name="InstallationFoldersVersioned" xml:space="preserve"><value>Keep each version (e.g. LoxoneConfig_17031027_Beta)</value></data>
+  <data name="InstallationFoldersSingle" xml:space="preserve"><value>One installation per channel (e.g. LoxoneConfig_Beta)</value></data>
+  <data name="SettingsStartupTray" xml:space="preserve"><value>Startup &amp; tray</value></data>
+  <data name="SettingsInstallationsProjects" xml:space="preserve"><value>Installations &amp; projects</value></data>
+  <data name="SettingsMore" xml:space="preserve"><value>More settings</value></data>
+  <data name="SettingsAddFolder" xml:space="preserve"><value>Add folder…</value></data>
+  <data name="TrayOnboarding_DoneOpenSettings" xml:space="preserve"><value>Got it — Open Settings</value></data>
 </root>
