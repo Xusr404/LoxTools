@@ -6,6 +6,23 @@ The project uses Semantic Versioning and supports `alpha`, `beta`, `rc`, and sta
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-10-30
+
+### Added
+
+- First-run guidance for accessing LoxTools from the system tray.
+- Installation folder modes and automatic registration of successful installation paths.
+
+### Changed
+
+- Refined Settings and Version Selector layouts and button styling.
+- Improved download cancellation, installation progress, installer monitoring, and cleanup.
+- Expanded English and German translations.
+
+### Fixed
+
+- Preserve existing files when downloads or installer extraction fail.
+
 ## [1.1.0] - 2026-06-21
 
 ### Added
