@@ -121,7 +121,9 @@ namespace LoxTools.UpdateCheck {
                 trimmed = trimmed.Substring(2);
             }
 
-            return trimmed.ToLowerInvariant();
+            return Regex.IsMatch(trimmed, "^[0-9a-fA-F]{1,8}$", RegexOptions.CultureInvariant)
+                ? trimmed.ToLowerInvariant().PadLeft(8, '0')
+                : string.Empty;
         }
     }
 }

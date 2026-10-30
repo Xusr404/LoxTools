@@ -10,6 +10,7 @@ namespace LoxTools.UpdateCheck {
         private readonly BoundedFileDownloader downloader;
         private readonly SecureInstallerExtractor extractor;
         private readonly IInstallerSignatureVerifier signatureVerifier;
+        internal Action<UpdateCheckState, int?> ReportStatus { get; set; }
 
         public UpdateInstallerPipeline(HttpClient httpClient, IInstallerSignatureVerifier signatureVerifier) {
             downloader = new BoundedFileDownloader(httpClient);
@@ -27,8 +28,11 @@ namespace LoxTools.UpdateCheck {
 
             Directory.CreateDirectory(workingFolder);
             string archivePath = Path.Combine(workingFolder, "LoxoneConfigUpdate.zip");
-            await downloader.DownloadAsync(target.DownloadUri, archivePath, target.FileSize, cancellationToken).ConfigureAwait(false);
+            await downloader.DownloadAsync(target.DownloadUri, archivePath, target.FileSize, cancellationToken,
+                percent => ReportStatus?.Invoke(UpdateCheckState.Downloading, percent)).ConfigureAwait(false);
 
+            cancellationToken.ThrowIfCancellationRequested();
+            ReportStatus?.Invoke(UpdateCheckState.Verifying, null);
             string actualCrc;
             using (var fileStream = new FileStream(archivePath, FileMode.Open, FileAccess.Read, FileShare.Read)) {
                 actualCrc = Crc32Helper.ComputeCrc32(fileStream).ToString("x8");
@@ -39,12 +43,18 @@ namespace LoxTools.UpdateCheck {
             }
 
             string extractFolder = Path.Combine(workingFolder, "extracted");
+            cancellationToken.ThrowIfCancellationRequested();
+            ReportStatus?.Invoke(UpdateCheckState.Extracting, null);
             string installerPath = extractor.Extract(archivePath, extractFolder);
+            cancellationToken.ThrowIfCancellationRequested();
             UpdateValidationFailure signatureResult = signatureVerifier.Verify(installerPath);
             if (signatureResult != UpdateValidationFailure.None) {
                 throw new UpdateSecurityException(signatureResult, "The update installer signature is not trusted.");
             }
 
+            try { File.Delete(archivePath); }
+            catch (IOException) { UpdateLog.Write("Archive cleanup deferred: file is still in use."); }
+            catch (UnauthorizedAccessException) { UpdateLog.Write("Archive cleanup deferred: access denied."); }
             return installerPath;
         }
     }

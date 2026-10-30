@@ -85,7 +85,7 @@ namespace LoxTools {
 		private void BrowseConfig_Click(object sender, RoutedEventArgs e) {
 			using var fbd = new WinForms.FolderBrowserDialog {
 				RootFolder = Environment.SpecialFolder.MyComputer,
-				SelectedPath = @"C:\Program Files (x86)\"
+				SelectedPath = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86)
 			};
 
 			if (fbd.ShowDialog() == WinForms.DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath)) {
@@ -97,6 +97,10 @@ namespace LoxTools {
 					_ = Vm.ShowConfigExistsMessage();
 				}
 			}
+		}
+
+		private void ShowTrayOnboarding_Click(object sender, RoutedEventArgs e) {
+			LoxToolsApplication.GetInstance()?.ShowTrayOnboarding();
 		}
 
 		private void BrowseProjects_Click(object sender, RoutedEventArgs e) {
@@ -248,6 +252,7 @@ namespace LoxTools {
 				initialAppUpdateChannel = SelectedAppUpdateChannel;
 				AlwaysShowSelectionDialog = Properties.Settings.Default.alwaysShowSelectionDialog;
 				UseLatestVersion = Properties.Settings.Default.useLatestVersion;
+				VersionedInstallationFolders = Properties.Settings.Default.VersionedInstallationFolders;
 				LoadInstalledVersions();
 
 				LoadPaths(
@@ -269,6 +274,28 @@ namespace LoxTools {
 			});
 		}
 
+		private bool versionedInstallationFolders;
+		public bool VersionedInstallationFolders {
+			get => versionedInstallationFolders;
+			set {
+				if (versionedInstallationFolders == value) return;
+				versionedInstallationFolders = value;
+				OnPropertyChanged();
+				OnPropertyChanged(nameof(SingleInstallationPerChannel));
+			}
+		}
+		public bool SingleInstallationPerChannel {
+			get => !VersionedInstallationFolders;
+			set => VersionedInstallationFolders = !value;
+		}
+		public string InstallationFoldersTitle => Lang.InstallationFoldersTitle;
+		public string InstallationFoldersHint => Lang.InstallationFoldersHint;
+		public string InstallationFoldersVersioned => Lang.InstallationFoldersVersioned;
+		public string InstallationFoldersSingle => Lang.InstallationFoldersSingle;
+		public string StartupTrayTitle => Lang.SettingsStartupTray;
+		public string InstallationsProjectsTitle => Lang.SettingsInstallationsProjects;
+		public string MoreSettingsTitle => Lang.SettingsMore;
+		public string AddFolderLabel => Lang.SettingsAddFolder;
 		public string LangSettings => Lang.Settings;
 		public string LangWindowsAutostartup => Lang.WindowsAutostartup;
 		public string LangRunAtWindowsStartup => Lang.RunAtWindowsStartup;
@@ -280,6 +307,9 @@ namespace LoxTools {
 		public string LangSectionPaths => Lang.SettingsSectionPaths;
 		public string LangSectionAdvanced => Lang.SettingsSectionAdvanced;
 		public string LangAlwaysShowDialogHint => Lang.SettingsAlwaysShowDialogHint;
+		public string TrayOnboardingSettingsTitle => Lang.TrayOnboarding_SettingsTitle;
+		public string TrayOnboardingSettingsHint => Lang.TrayOnboarding_SettingsHint;
+		public string TrayOnboardingSettingsButton => Lang.TrayOnboarding_SettingsButton;
 		public string LangProjectFoldersHint => Lang.SettingsProjectFoldersHint;
 		public string LangNoInstallationPathTitle => Lang.NoInstallationPath_Title;
 		public string LangNoInstallationPathDescription => Lang.NoInstallationPath_Description;
@@ -688,6 +718,7 @@ namespace LoxTools {
 				Properties.Settings.Default.middleMouseButtonEvent = MiddleMouseButtonEvent;
 				Properties.Settings.Default.alwaysShowSelectionDialog = AlwaysShowSelectionDialog;
 				Properties.Settings.Default.useLatestVersion = UseLatestVersion;
+				Properties.Settings.Default.VersionedInstallationFolders = VersionedInstallationFolders;
 				Properties.Settings.Default.AppUpdateAutoCheckEnabled = AppUpdateAutoCheckEnabled;
 				Properties.Settings.Default.AppUpdateChannel = (int)SelectedAppUpdateChannel;
 

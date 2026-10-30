@@ -183,5 +183,29 @@ namespace LoxTools.Properties {
             set { this["AppUpdateLastNotifiedVersion"] = value; }
         }
 
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool TrayOnboardingShown {
+            get { return ((bool)(this["TrayOnboardingShown"])); }
+            set { this["TrayOnboardingShown"] = value; }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool VersionedInstallationFolders {
+            get { return ((bool)(this["VersionedInstallationFolders"])); }
+            set { this["VersionedInstallationFolders"] = value; }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool InitialSettingsPending {
+            get { return ((bool)(this["InitialSettingsPending"])); }
+            set { this["InitialSettingsPending"] = value; }
+        }
+
     }
 }

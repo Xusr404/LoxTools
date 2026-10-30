@@ -13,6 +13,18 @@ namespace LoxTools.Tests {
         private static readonly Uri PackageUri = new Uri("https://updatefiles.loxone.com/LoxConfig/update.zip");
 
         [TestMethod]
+        public async Task FailedDownloadPreservesExistingFile() {
+            using (var temp = new TemporaryDirectory())
+            using (HttpClient client = CreateClient(new ByteArrayContent(new byte[] { 1, 2, 3 }))) {
+                string path = Path.Combine(temp.Path, "update.zip");
+                File.WriteAllText(path, "previous installer");
+                await Assert.ThrowsExceptionAsync<UpdateSecurityException>(() =>
+                    new BoundedFileDownloader(client).DownloadAsync(PackageUri, path, 4, CancellationToken.None));
+                Assert.AreEqual("previous installer", File.ReadAllText(path));
+            }
+        }
+
+        [TestMethod]
         public async Task DownloadWritesOnlyTheDeclaredNumberOfBytes() {
             byte[] content = { 1, 2, 3, 4 };
             using (var temp = new TemporaryDirectory())

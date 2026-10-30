@@ -24,6 +24,7 @@ namespace LoxTools.UpdateCheck {
             string workingFolder,
             CancellationToken cancellationToken) {
             string installerPath = await pipeline.PrepareAsync(target, workingFolder, cancellationToken).ConfigureAwait(false);
+            cancellationToken.ThrowIfCancellationRequested();
             shortcutWriter(installerPath);
             return processLauncher(installerPath);
         }

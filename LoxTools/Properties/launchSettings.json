@@ -3,6 +3,13 @@
     "LoxTools": {
       "commandName": "Project"
     },
+    "Onboarding Test": {
+      "commandName": "Project",
+      "commandLineArgs": "--test-tray-onboarding",
+      "environmentVariables": {
+        "LOXTOOLS_TEST_TRAY_ONBOARDING": "1"
+      }
+    },
     "SimulateUpdateAvailable": {
       "commandName": "Project",
       "commandLineArgs": "--simulate-update",

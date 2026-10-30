@@ -48,6 +48,7 @@ namespace LoxTools {
 
         VersionSelectorWindow mainForm;
         SettingsWindow settingsWindow;
+        TrayOnboardingWindow trayOnboardingWindow;
         CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
         private readonly Control uiInvokeControl;
 
@@ -61,8 +62,12 @@ namespace LoxTools {
         private UpdateCheckService updateCheckService;
         private AppUpdateService appUpdateService;
         private bool simulateUpdateAvailable;
+        private readonly bool testTrayOnboarding;
+        private bool persistTrayOnboardingOnClose;
         private const int FirstStartupScanBudgetMs = 300;
         private const int FirstStartupScanEntryLimit = 500;
+        internal const string TrayOnboardingTestArgument = "test-tray-onboarding";
+        internal const string TrayOnboardingTestEnvironmentVariable = "LOXTOOLS_TEST_TRAY_ONBOARDING";
 
         public static class WatcherFilter {
             public const string
@@ -119,7 +124,11 @@ namespace LoxTools {
             uiInvokeControl.CreateControl();
 
             Application.ApplicationExit += new EventHandler(this.onApplicationExit);
-            SettingsGuard.EnsureReadable();
+            testTrayOnboarding = IsTrayOnboardingTestRequested(args);
+            if (!testTrayOnboarding) {
+                SettingsGuard.EnsureReadable();
+            }
+
             simulateUpdateAvailable =
                 HasArgument(args, "simulate-update")
                 || HasArgument(args, "simulateupdateavailable")
@@ -129,11 +138,18 @@ namespace LoxTools {
                 || IsEnvironmentFlagSet("CVS_SIMULATE_UPDATE")
                 || IsEnvironmentFlagSet("CONFIGVERSIONSELECTOR_SIMULATE_UPDATE");
 
-            EnsureSettingsUpgraded();
-            bool isFirstStartup = InitialSetup.CheckRunInitialSetup();
+            bool isFirstStartup = false;
+            if (!testTrayOnboarding) {
+                EnsureSettingsUpgraded();
+                isFirstStartup = InitialSetup.CheckRunInitialSetup();
+            } else {
+                Debug.WriteLine("Tray onboarding test mode enabled.");
+            }
             InitializeComponent(isFirstStartup);
 
-            processArgs(args, shiftPressed);
+            if (!testTrayOnboarding) {
+                processArgs(args, shiftPressed);
+            }
 		}
 
         private void InitializeComponent(bool isFirstStartup) {
@@ -168,8 +184,10 @@ namespace LoxTools {
             EnsureMainWindow();
             #endregion
 
-            if (isFirstStartup) {
-                ShowSettingsWindow(false);
+            if (testTrayOnboarding) {
+                ShowTrayOnboarding(persistOnClose: false, openSettingsAfter: true);
+            } else {
+                TryShowTrayOnboarding(isFirstStartup);
             }
         }
 
@@ -288,6 +306,11 @@ namespace LoxTools {
 
         public void OnInstanceInvoked(string[] args) {
             RunOnUiThread(() => {
+                if (IsTrayOnboardingTestRequested(args)) {
+                    ShowTrayOnboarding(persistOnClose: false, openSettingsAfter: true);
+                    return;
+                }
+
                 bool shiftPressed = ShiftPressed();
 
                 string? pathFromAgrument = filePathFromArgs(args);
@@ -301,20 +324,23 @@ namespace LoxTools {
             if (action == null)
                 return;
 
-            if (mainForm != null) {
-                if (mainForm.Dispatcher.CheckAccess()) {
-                    action();
-                } else {
-                    mainForm.Dispatcher.BeginInvoke(action);
-                }
-                return;
-            }
-
+            // The application is hosted by a WinForms ApplicationContext. Always prefer
+            // its guaranteed message-loop control; mainForm may exist without ever being
+            // shown, so its WPF Dispatcher is not a reliable marshal target for IPC calls.
             if (uiInvokeControl != null && !uiInvokeControl.IsDisposed) {
                 if (uiInvokeControl.InvokeRequired) {
                     uiInvokeControl.BeginInvoke(action);
                 } else {
                     action();
+                }
+                return;
+            }
+
+            if (mainForm != null) {
+                if (mainForm.Dispatcher.CheckAccess()) {
+                    action();
+                } else {
+                    mainForm.Dispatcher.BeginInvoke(action);
                 }
                 return;
             }
@@ -398,6 +424,9 @@ namespace LoxTools {
             loadData();
             findAllProjectFiles();
             findAllApplications();
+            if (Watchers != null) {
+                foreach (var watcher in Watchers) watcher?.Dispose();
+            }
             Watchers = new FileSystemWatcher[ConfigFolderPaths.Count() + ProjectsFolderPaths.Count()];
             createPathWatchers(ConfigFolderPaths, WatcherFilter.LoxoneConfig);
             createFileWatchers(ProjectsFolderPaths, WatcherFilter.loxoneFile);
@@ -666,6 +695,7 @@ namespace LoxTools {
                         settingsWindow.WindowState = System.Windows.WindowState.Normal;
                     }
                     settingsWindow.Activate();
+                    CompleteInitialSettings();
                 } catch {
                 }
                 return;
@@ -688,6 +718,75 @@ namespace LoxTools {
             } else {
                 settingsWindow.Show();
             }
+            CompleteInitialSettings();
+        }
+
+        private void CompleteInitialSettings() {
+            if (testTrayOnboarding) return;
+            SettingsGuard.Execute(() => {
+                if (!Properties.Settings.Default.InitialSettingsPending) return;
+                Properties.Settings.Default.InitialSettingsPending = false;
+                Properties.Settings.Default.TrayOnboardingShown = true;
+                Properties.Settings.Default.Save();
+            });
+        }
+
+        private void TryShowTrayOnboarding(bool isFirstStartup) {
+            bool onboardingShown = false;
+            bool initialSettingsPending = isFirstStartup;
+            SettingsGuard.Execute(
+                () => {
+                    onboardingShown = Properties.Settings.Default.TrayOnboardingShown;
+                    initialSettingsPending |= Properties.Settings.Default.InitialSettingsPending;
+                },
+                () => onboardingShown = false);
+
+            if (!onboardingShown || initialSettingsPending) {
+                ShowTrayOnboarding(openSettingsAfter: initialSettingsPending);
+            }
+        }
+
+        public void ShowTrayOnboarding(bool persistOnClose = true, bool openSettingsAfter = false) {
+            RunOnUiThread(() => {
+                if (trayOnboardingWindow != null) {
+                    trayOnboardingWindow.BringToFront();
+                    return;
+                }
+
+                trayOnboardingWindow = new TrayOnboardingWindow(openSettingsAfter);
+                persistTrayOnboardingOnClose = persistOnClose;
+                trayOnboardingWindow.Closed += TrayOnboardingWindow_Closed;
+
+                if (settingsWindow?.IsVisible == true) {
+                    trayOnboardingWindow.Owner = settingsWindow;
+                    trayOnboardingWindow.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
+                }
+
+                trayOnboardingWindow.Show();
+                trayOnboardingWindow.BringToFront();
+            });
+        }
+
+        private void TrayOnboardingWindow_Closed(object sender, EventArgs e) {
+            if (trayOnboardingWindow == null) {
+                return;
+            }
+
+            bool openSettingsAfter = trayOnboardingWindow.OpensSettings && trayOnboardingWindow.WasAcknowledged;
+            bool initialSetupGuide = trayOnboardingWindow.OpensSettings;
+            trayOnboardingWindow.Closed -= TrayOnboardingWindow_Closed;
+            trayOnboardingWindow = null;
+
+            bool persist = persistTrayOnboardingOnClose;
+            persistTrayOnboardingOnClose = false;
+            if (openSettingsAfter) ShowSettingsWindow(modal: false);
+            // Initial setup is completed by opening Settings, independently of saving it.
+            // Dismissing its guide with X leaves setup pending for the next launch.
+            if (!persist || initialSetupGuide) return;
+            SettingsGuard.Execute(() => {
+                Properties.Settings.Default.TrayOnboardingShown = true;
+                Properties.Settings.Default.Save();
+            });
         }
 
         private void SettingsWindow_SettingsSaved(object sender, EventArgs e) {
@@ -702,6 +801,7 @@ namespace LoxTools {
             settingsWindow.SettingsSaved -= SettingsWindow_SettingsSaved;
             settingsWindow.Closed -= SettingsWindow_Closed;
             settingsWindow = null;
+
         }
 
         #endregion
@@ -795,6 +895,15 @@ namespace LoxTools {
                 CloseThisApplication,
                 simulateUpdateAvailable);
             ContextMenuManager.UpdateCheckService = updateCheckService;
+            updateCheckService.InstallationCompleted += root => {
+                if (string.IsNullOrWhiteSpace(root) || !Directory.Exists(root)) return;
+                SettingsGuard.Execute(() => {
+                    Properties.Settings.Default.SavedPaths = InstallationDestination.IncludeRoot(
+                        Properties.Settings.Default.SavedPaths, root);
+                    Properties.Settings.Default.Save();
+                });
+                UpdateData();
+            };
             updateCheckService.Start();
         }
 
@@ -933,6 +1042,12 @@ namespace LoxTools {
             }
 
             return value.Replace("-", string.Empty).Trim();
+        }
+
+        internal static bool IsTrayOnboardingTestRequested(string[] args) {
+            return HasArgument(args, TrayOnboardingTestArgument)
+                || HasArgument(Environment.GetCommandLineArgs(), TrayOnboardingTestArgument)
+                || IsEnvironmentFlagSet(TrayOnboardingTestEnvironmentVariable);
         }
 
         private static bool IsEnvironmentFlagSet(string name) {

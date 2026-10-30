@@ -25,6 +25,7 @@ namespace LoxTools.Tests {
 
                 Assert.IsTrue(verifier.WasCalled);
                 Assert.IsTrue(File.Exists(installerPath));
+                Assert.IsFalse(File.Exists(Path.Combine(temp.Path, "LoxoneConfigUpdate.zip")));
             }
         }
 
@@ -90,6 +91,22 @@ namespace LoxTools.Tests {
 
                 Assert.AreEqual(0, shortcutCalls);
                 Assert.AreEqual(0, launchCalls);
+            }
+        }
+
+        [TestMethod]
+        public async Task CorruptArchiveNeverReachesSignatureVerificationOrInstaller() {
+            byte[] bytes = CreateArchiveBytes();
+            UpdateInfo target = CreateTarget(bytes);
+            bytes[0] ^= 1;
+            var verifier = new FakeSignatureVerifier(UpdateValidationFailure.None);
+            using (var temp = new TemporaryDirectory())
+            using (HttpClient client = CreateClient(bytes)) {
+                var pipeline = new UpdateInstallerPipeline(client, verifier);
+                var error = await Assert.ThrowsExceptionAsync<UpdateSecurityException>(() =>
+                    pipeline.PrepareAsync(target, temp.Path, CancellationToken.None));
+                Assert.AreEqual(UpdateValidationFailure.Crc32, error.Failure);
+                Assert.IsFalse(verifier.WasCalled);
             }
         }
 

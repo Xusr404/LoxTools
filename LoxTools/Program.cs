@@ -28,10 +28,27 @@ namespace LoxTools {
             Thread.CurrentThread.CurrentUICulture = ci;
 #endif
 			bool shiftPressed = LoxToolsApplication.ShiftPressed();
+            bool onboardingTestRequested = LoxToolsApplication.IsTrayOnboardingTestRequested(args);
+#if DEBUG
+            Console.WriteLine($"Onboarding test requested: {onboardingTestRequested}");
+#endif
+
+            if (onboardingTestRequested) {
+                Application.SetHighDpiMode(HighDpiMode.SystemAware);
+                Application.EnableVisualStyles();
+                Application.SetCompatibleTextRenderingDefault(false);
+                Application.Run(new LoxToolsApplication(args, shiftPressed));
+                return;
+            }
 
             SingleInstanceHandler app = new SingleInstanceHandler();
 
-            var isFirstInstance = app.InitializeAsFirstInstance(nameof(LoxTools));
+#if DEBUG
+			string singleInstanceName = "LoxTools.Debug";
+#else
+			string singleInstanceName = nameof(LoxTools);
+#endif
+			var isFirstInstance = app.InitializeAsFirstInstance(singleInstanceName);
             if (isFirstInstance) {
                 try {
                     app.Run(args, shiftPressed);

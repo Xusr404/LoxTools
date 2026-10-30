@@ -17,6 +17,13 @@ namespace LoxTools.UpdateCheck {
     internal enum UpdateCheckState {
         Checking,
         Downloading,
+        Verifying,
+        Extracting,
+        Cancelled,
+        Installing,
+        CancellingInstaller,
+        InstallationCancelled,
+        Installed,
         UpdateAvailable,
         UpToDate,
         Failed
@@ -28,7 +35,7 @@ namespace LoxTools.UpdateCheck {
 
         private static readonly TimeSpan StartupDelay = TimeSpan.FromSeconds(15);
         private static readonly TimeSpan NormalInterval = TimeSpan.FromHours(12);
-        private static readonly TimeSpan HttpTimeout = TimeSpan.FromSeconds(15);
+        private static readonly TimeSpan HttpTimeout = TimeSpan.FromSeconds(35);
         private static readonly TimeSpan InstallerDownloadTimeout = TimeSpan.FromMinutes(20);
         private static readonly TimeSpan RetryDelayShort = TimeSpan.FromSeconds(3);
         private static readonly TimeSpan RetryDelayLong = TimeSpan.FromSeconds(10);
@@ -57,6 +64,12 @@ namespace LoxTools.UpdateCheck {
         private UpdateChannel lastResolvedChannel = UpdateChannel.Release;
         private UpdateChannel? forcedChannel;
         private readonly object forcedChannelLock = new object();
+        private readonly object downloadGate = new object();
+        private CancellationTokenSource activeDownload;
+        private volatile bool userCancelledDownload;
+        private volatile bool disposed;
+        private string installationRoot;
+        public event Action<string> InstallationCompleted;
 
         public UpdateCheckService(
             ISynchronizeInvoke uiInvoker,
@@ -86,6 +99,10 @@ namespace LoxTools.UpdateCheck {
             this.httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
             xmlClient = new UpdateCheckXmlClient(this.httpClient);
             var installerPipeline = new UpdateInstallerPipeline(this.httpClient, signatureVerifier);
+            installerPipeline.ReportStatus = (phase, percent) => {
+                if (state != phase) UpdateState(phase, isEnabled: true);
+                if (percent.HasValue) InvokeOnUi(() => ContextMenuManager.UpdateDownloadProgress(percent.Value));
+            };
             installerWorkflow = new UpdateInstallerWorkflow(installerPipeline, CreateInstallerShortcut, StartInstallerProcess);
         }
 
@@ -100,11 +117,18 @@ namespace LoxTools.UpdateCheck {
         }
 
         public void HandleMenuAction() {
+            lock (downloadGate) {
+                if (activeDownload != null) {
+                    userCancelledDownload = true;
+                    activeDownload.Cancel();
+                    return;
+                }
+            }
             if (simulateUpdateAvailable) {
                 UpdateState(UpdateCheckState.UpdateAvailable, isEnabled: true);
                 return;
             }
-            if (state == UpdateCheckState.UpdateAvailable) {
+            if (state == UpdateCheckState.UpdateAvailable || state == UpdateCheckState.Cancelled || state == UpdateCheckState.InstallationCancelled) {
                 _ = DownloadAndInstallAsync();
             } else {
                 SetForcedChannel(GetConfiguredChannel());
@@ -142,6 +166,7 @@ namespace LoxTools.UpdateCheck {
         }
 
         private void ScheduleNextCheck(TimeSpan delay) {
+            if (disposed) return;
             if (delay < TimeSpan.Zero) {
                 delay = TimeSpan.Zero;
             }
@@ -151,6 +176,7 @@ namespace LoxTools.UpdateCheck {
         }
 
         private async Task RunCheckAsync(bool force) {
+            if (disposed) return;
             if (!force && !IsCheckAllowedNow()) {
                 ScheduleNextCheck(CalculateInitialDelay());
                 return;
@@ -168,7 +194,8 @@ namespace LoxTools.UpdateCheck {
                 UpdateChannel configuredChannel = ConsumeForcedChannel() ?? GetConfiguredChannel();
                 lastConfiguredChannel = configuredChannel;
                 lastResolvedChannel = configuredChannel;
-                UpdateState(UpdateCheckState.Checking, isEnabled: false);
+                if (force || state != UpdateCheckState.Failed)
+                    UpdateState(UpdateCheckState.Checking, isEnabled: false);
                 UpdateLastAttempt(DateTime.UtcNow);
 
                 bool success = false;
@@ -218,6 +245,7 @@ namespace LoxTools.UpdateCheck {
                             break;
                         }
                     } catch (Exception ex) {
+                        UpdateLog.Write("Feed check failed: " + ex.GetType().Name + ": " + ex.Message);
                         Debug.WriteLine(ex);
                         if (attempt == 1) {
                             await Task.Delay(RetryDelayShort).ConfigureAwait(false);
@@ -229,7 +257,8 @@ namespace LoxTools.UpdateCheck {
 
                 if (success) {
                     ResetBackoff();
-                    UpdateState(updateAvailable ? UpdateCheckState.UpdateAvailable : UpdateCheckState.UpToDate, isEnabled: true);
+                    if (force || state != UpdateCheckState.Failed)
+                        UpdateState(updateAvailable ? UpdateCheckState.UpdateAvailable : UpdateCheckState.UpToDate, isEnabled: true);
                     ScheduleNextCheck(NormalInterval);
                 } else {
                     IncreaseBackoff();
@@ -294,8 +323,12 @@ namespace LoxTools.UpdateCheck {
             }
 
             string downloadFolder = null;
+            UpdateWorkingFolder workingFolder = null;
+            bool installerStarted = false;
+            bool installerExited = false;
             try {
-                UpdateState(UpdateCheckState.Downloading, isEnabled: false);
+                userCancelledDownload = false;
+                UpdateState(UpdateCheckState.Downloading, isEnabled: true);
                 UpdateInfo target = lastTargetInfo;
                 if (target == null || target.DownloadUri == null) {
                     UpdateState(UpdateCheckState.Failed, isEnabled: true);
@@ -303,64 +336,86 @@ namespace LoxTools.UpdateCheck {
                 }
 
                 string tempRoot = GetTempRoot();
-                downloadFolder = Path.Combine(tempRoot, Guid.NewGuid().ToString("N"));
-                Directory.CreateDirectory(downloadFolder);
+                workingFolder = new UpdateWorkingFolder(tempRoot);
+                downloadFolder = workingFolder.Path;
 
                 Process installerProcess;
                 using (var downloadCts = new CancellationTokenSource(InstallerDownloadTimeout)) {
-                    installerProcess = await installerWorkflow.ExecuteAsync(target, downloadFolder, downloadCts.Token).ConfigureAwait(false);
-                }
-
-                UpdateState(UpdateCheckState.UpdateAvailable, isEnabled: true);
-                if (installerProcess != null) {
-                    _ = Task.Run(() => {
-                        try {
-                            installerProcess.WaitForExit();
-                            IReadOnlyList<string> localBuilds = localBuildProvider?.Invoke() ?? Array.Empty<string>();
-                            NotifyLocalVersionsChanged(localBuilds);
-                        } catch (Exception ex) {
-                            Debug.WriteLine(ex);
-                        } finally {
-                            installerProcess.Dispose();
+                    lock (downloadGate) activeDownload = downloadCts;
+                    try {
+                        installerProcess = await installerWorkflow.ExecuteAsync(target, downloadFolder, downloadCts.Token).ConfigureAwait(false);
+                        if (installerProcess == null) throw new InvalidOperationException("Installer process did not start.");
+                        installerStarted = true;
+                        downloadCts.CancelAfter(Timeout.InfiniteTimeSpan);
+                        UpdateState(UpdateCheckState.Installing, isEnabled: false);
+                        using (installerProcess) {
+                            workingFolder.TrackInstaller(installerProcess);
+                            await InstallerProcessMonitor.WaitAsync(
+                                token => installerProcess.WaitForExitAsync(token),
+                                () => installerProcess.CloseMainWindow(),
+                                requested => {
+                                    UpdateLog.Write("Installer cancellation requested; close message sent: " + requested);
+                                    UpdateState(requested ? UpdateCheckState.CancellingInstaller : UpdateCheckState.Installing, isEnabled: false);
+                                }, downloadCts.Token).ConfigureAwait(false);
+                            installerExited = true;
+                            int exitCode = installerProcess.ExitCode;
+                            UpdateLog.Write("Installer exit code: " + exitCode);
+                            if (exitCode == 0) {
+                                UpdateState(UpdateCheckState.Installed, isEnabled: true);
+                                string completedRoot = installationRoot;
+                                InvokeOnUi(() => InstallationCompleted?.Invoke(completedRoot));
+                            } else if (exitCode == 2 || exitCode == 1602 || (exitCode == 5 && userCancelledDownload)) {
+                                UpdateState(UpdateCheckState.InstallationCancelled, isEnabled: true);
+                            } else {
+                                throw new InvalidOperationException("Installer failed with exit code " + exitCode);
+                            }
                         }
-                    });
+                    } finally {
+                        lock (downloadGate) activeDownload = null;
+                    }
                 }
 
-                _ = Task.Run(async () => {
-                    await Task.Delay(CleanupAge).ConfigureAwait(false);
-                    CleanupTempRoot(CleanupAge);
-                });
+            } catch (Win32Exception ex) when (ex.NativeErrorCode == 1223) {
+                UpdateLog.Write("Administrator elevation was cancelled; installation did not start.");
+                UpdateState(UpdateCheckState.InstallationCancelled, isEnabled: true);
             } catch (UpdateSecurityException ex) {
+                UpdateLog.Write("Validation failed: " + ex.Failure);
                 Debug.WriteLine($"Update security validation failed: {ex.Failure}");
-                TryDeleteDirectory(downloadFolder);
                 UpdateState(UpdateCheckState.Failed, isEnabled: true);
+            } catch (OperationCanceledException) {
+                UpdateLog.Write(userCancelledDownload ? "Download cancelled." : "Download timed out or application is closing.");
+                UpdateState(userCancelledDownload ? UpdateCheckState.Cancelled : UpdateCheckState.Failed, isEnabled: true);
             } catch (Exception ex) {
+                UpdateLog.Write("Update failed: " + ex.GetType().Name + ": " + ex.Message);
                 Debug.WriteLine(ex);
-                TryDeleteDirectory(downloadFolder);
                 UpdateState(UpdateCheckState.Failed, isEnabled: true);
             } finally {
+                if (!installerStarted || installerExited) workingFolder?.DeleteAfterExit();
+                else workingFolder?.Dispose(); // Keep identity if monitoring failed while the installer is alive.
                 operationLock.Release();
             }
         }
 
-        private static Process StartInstallerProcess(string installerPath) {
-            var startInfo = new ProcessStartInfo {
-                FileName = installerPath,
-                UseShellExecute = true
-            };
+        private Process StartInstallerProcess(string installerPath) {
+            string root = SettingsGuard.Execute(() => AppSettings.Default.SavedPaths, string.Empty)
+                .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).FirstOrDefault()?.Trim();
+            if (string.IsNullOrWhiteSpace(root)) {
+                root = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), InitialSetup.LoxoneFolderName);
+            }
+            bool versioned = SettingsGuard.Execute(() => AppSettings.Default.VersionedInstallationFolders, false);
+            string destination = InstallationDestination.GetPath(root, lastTargetInfo, versioned);
+            installationRoot = Path.GetDirectoryName(destination);
+            UpdateLog.Write($"Installation target: {destination}; versioned folders: {versioned}; channel: {lastTargetInfo.Channel}");
+            Directory.CreateDirectory(UpdateLog.Folder);
+            string logPath = Path.Combine(UpdateLog.Folder, "installer-" + Guid.NewGuid().ToString("N") + ".log");
+            UpdateLog.Write("Silent installer log: " + logPath);
+            var startInfo = InstallationDestination.CreateStartInfo(installerPath, destination, logPath);
             return Process.Start(startInfo);
         }
 
-        private static void TryDeleteDirectory(string path) {
-            try {
-                if (!string.IsNullOrWhiteSpace(path) && Directory.Exists(path)) {
-                    Directory.Delete(path, recursive: true);
-                }
-            } catch {
-            }
-        }
-
         private void UpdateState(UpdateCheckState newState, bool isEnabled) {
+            if (disposed) return;
+            UpdateLog.Write("State: " + newState);
             state = newState;
             string versionLabel = null;
             if (newState == UpdateCheckState.UpdateAvailable) {
@@ -386,6 +441,7 @@ namespace LoxTools.UpdateCheck {
         }
 
         public void NotifyLocalVersionsChanged(IReadOnlyList<string> localBuilds) {
+            if (state == UpdateCheckState.Downloading || state == UpdateCheckState.Verifying || state == UpdateCheckState.Extracting || state == UpdateCheckState.Installing || state == UpdateCheckState.CancellingInstaller || state == UpdateCheckState.Failed) return;
             if (simulateUpdateAvailable) {
                 return;
             }
@@ -408,32 +464,11 @@ namespace LoxTools.UpdateCheck {
         }
 
         internal static string GetTempRoot() {
-            return Path.Combine(Path.GetTempPath(), "LoxTools", "LoxoneConfigUpdate");
+            return UpdateLog.Folder;
         }
 
         private static void CleanupTempRoot(TimeSpan minAge) {
-            try {
-                string tempRoot = GetTempRoot();
-                if (!Directory.Exists(tempRoot)) {
-                    return;
-                }
-
-                foreach (string dir in Directory.GetDirectories(tempRoot)) {
-                    try {
-                        var info = new DirectoryInfo(dir);
-                        if (minAge > TimeSpan.Zero) {
-                            TimeSpan age = DateTime.UtcNow - info.LastWriteTimeUtc;
-                            if (age < minAge) {
-                                continue;
-                            }
-                        }
-
-                        info.Delete(true);
-                    } catch {
-                    }
-                }
-            } catch {
-            }
+            UpdateWorkingFolder.Cleanup(GetTempRoot(), minAge);
         }
 
         private void CreateInstallerShortcut(string installerPath) {
@@ -455,12 +490,11 @@ namespace LoxTools.UpdateCheck {
                 string versionPart = string.IsNullOrWhiteSpace(lastRemoteVersionDisplay) ? "Latest" : SanitizeFileNamePart(lastRemoteVersionDisplay);
                 string fileName = $"LoxoneConfigInstaller_{versionPart}.url";
                 string shortcutPath = Path.Combine(downloadsFolder, fileName);
-                string fileUrl = new Uri(installerPath).AbsoluteUri;
+                // The stable diagnostics folder survives individual installer cleanup.
+                string fileUrl = new Uri(GetTempRoot() + Path.DirectorySeparatorChar).AbsoluteUri;
 
                 string contents = "[InternetShortcut]" + Environment.NewLine
-                    + "URL=" + fileUrl + Environment.NewLine
-                    + "IconFile=" + installerPath + Environment.NewLine
-                    + "IconIndex=0" + Environment.NewLine;
+                    + "URL=" + fileUrl + Environment.NewLine;
 
                 File.WriteAllText(shortcutPath, contents);
             } catch {
@@ -626,9 +660,11 @@ namespace LoxTools.UpdateCheck {
         }
 
         public void Dispose() {
+            disposed = true;
+            lock (downloadGate) activeDownload?.Cancel();
             checkTimer?.Dispose();
             httpClient?.Dispose();
-            operationLock?.Dispose();
+            // In-flight operations still release the semaphore in their finally blocks.
         }
 
         private sealed class LocalVersionInfo {

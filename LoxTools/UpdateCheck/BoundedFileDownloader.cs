@@ -14,7 +14,7 @@ namespace LoxTools.UpdateCheck {
             this.httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
         }
 
-        public async Task DownloadAsync(Uri uri, string destinationPath, long expectedSize, CancellationToken cancellationToken) {
+        public async Task DownloadAsync(Uri uri, string destinationPath, long expectedSize, CancellationToken cancellationToken, Action<int> progress = null) {
             if (uri == null) {
                 throw new ArgumentNullException(nameof(uri));
             }
@@ -25,6 +25,7 @@ namespace LoxTools.UpdateCheck {
                 throw new UpdateSecurityException(UpdateValidationFailure.Size, "The declared package size is outside the allowed range.");
             }
 
+            bool created = false;
             try {
                 using (var request = new HttpRequestMessage(HttpMethod.Get, uri))
                 using (var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false)) {
@@ -45,6 +46,7 @@ namespace LoxTools.UpdateCheck {
 
                     using (Stream input = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false))
                     using (var output = new FileStream(destinationPath, FileMode.CreateNew, FileAccess.Write, FileShare.None, BufferSize, useAsync: true)) {
+                        created = true;
                         var buffer = new byte[BufferSize];
                         long totalBytes = 0;
                         int bytesRead;
@@ -55,6 +57,7 @@ namespace LoxTools.UpdateCheck {
                             }
 
                             await output.WriteAsync(buffer, 0, bytesRead, cancellationToken).ConfigureAwait(false);
+                            progress?.Invoke((int)(totalBytes * 100 / expectedSize));
                         }
 
                         if (totalBytes != expectedSize) {
@@ -63,7 +66,7 @@ namespace LoxTools.UpdateCheck {
                     }
                 }
             } catch {
-                TryDelete(destinationPath);
+                if (created) TryDelete(destinationPath);
                 throw;
             }
         }

@@ -14,8 +14,15 @@ namespace LoxTools.UpdateCheck {
             this.httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
         }
 
-        public async Task<string> DownloadUpdateCheckXmlAsync(CancellationToken ct) {
-            using (var request = new HttpRequestMessage(HttpMethod.Get, UpdateSecurityPolicy.MetadataUri))
+        public Task<string> DownloadUpdateCheckXmlAsync(CancellationToken ct) {
+            return DownloadAsync(UpdateSecurityPolicy.MetadataUri, ct);
+        }
+
+        private async Task<string> DownloadAsync(Uri uri, CancellationToken cancellationToken) {
+            using (var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken)) {
+            timeout.CancelAfter(TimeSpan.FromSeconds(15));
+            CancellationToken ct = timeout.Token;
+            using (var request = new HttpRequestMessage(HttpMethod.Get, uri))
             using (var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct).ConfigureAwait(false)) {
                 UpdateSecurityPolicy.EnsureSuccessfulResponse(response);
 
@@ -40,6 +47,7 @@ namespace LoxTools.UpdateCheck {
 
                     return Encoding.UTF8.GetString(output.ToArray());
                 }
+            }
             }
         }
     }

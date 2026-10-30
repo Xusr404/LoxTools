@@ -89,10 +89,14 @@ namespace LoxTools.UI.Tray {
 				Lang.OpenLxApp,
 			    OpenLoxoneApp
 			),
-			new ProcessToolStripItem (
+		    new ProcessToolStripItem (
 				Lang.CloseAllConfigs,
 			    closeAllRunningConfigApplication
 		    ),
+		    new ProcessToolStripItem (
+				Lang.TrayOnboarding_Menu,
+				openTrayOnboarding
+			),
 		    new ProcessToolStripItem (
 				Lang.Settings,
                 openSettingsForm
@@ -350,7 +354,7 @@ namespace LoxTools.UI.Tray {
 
             updateCheckMenuItem = new ProcessToolStripItem(
                 Lang.UpdateCheck_Checking,
-                () => UpdateCheckService?.HandleMenuAction(),
+                () => { AllowContextMenuClosing = false; UpdateCheckService?.HandleMenuAction(); },
                 onMiddleClickAction: TryOpenUpdateDownloadFolder);
             updateCheckMenuItem.ImageScaling = ToolStripItemImageScaling.SizeToFit;
             updateCheckMenuItem.Enabled = false;
@@ -464,11 +468,29 @@ namespace LoxTools.UI.Tray {
                 return;
             }
 
+            if (state == UpdateCheckState.Downloading && updateCheckState != state) downloadPercent = 0;
             updateCheckState = state;
             updateCheckVersionLabel = versionLabel;
             updateCheckChannel = channel;
 
             switch (state) {
+                case UpdateCheckState.Cancelled:
+                case UpdateCheckState.CancellingInstaller:
+                case UpdateCheckState.InstallationCancelled:
+                case UpdateCheckState.Verifying:
+                case UpdateCheckState.Extracting:
+                case UpdateCheckState.Installing:
+                case UpdateCheckState.Installed:
+                    StopUpdateCheckAnimation();
+                    updateCheckMenuItem.Enabled = enabled;
+                    updateCheckMenuItem.Text = state == UpdateCheckState.CancellingInstaller ? Lang.UpdateCheck_CancellingInstaller
+                        : state == UpdateCheckState.InstallationCancelled ? Lang.UpdateCheck_InstallationCancelled
+                        : state == UpdateCheckState.Verifying ? Lang.AppUpdate_Verifying
+                        : state == UpdateCheckState.Extracting ? Lang.UpdateCheck_Extracting
+                        : state == UpdateCheckState.Cancelled ? Lang.UpdateCheck_Cancelled
+                        : state == UpdateCheckState.Installing ? Lang.UpdateCheck_Installing : Lang.UpdateCheck_Installed;
+                    updateCheckMenuItem.Image = GetUpdateCheckIcon(state);
+                    break;
                 case UpdateCheckState.Checking:
                     updateCheckMenuItem.Enabled = false;
                     updateCheckMenuItem.Image = GetUpdateCheckIcon(UpdateCheckState.Checking);
@@ -476,7 +498,7 @@ namespace LoxTools.UI.Tray {
                     SetTrayIconWarning(false);
                     break;
                 case UpdateCheckState.Downloading:
-                    updateCheckMenuItem.Enabled = false;
+                    updateCheckMenuItem.Enabled = true;
                     updateCheckMenuItem.Image = GetUpdateCheckIcon(UpdateCheckState.Downloading);
                     StartUpdateCheckAnimation(Lang.UpdateCheck_Downloading_WithDots);
                     SetTrayIconWarning(false);
@@ -519,6 +541,19 @@ namespace LoxTools.UI.Tray {
                     SetTrayIconWarning(false);
                     break;
             }
+        }
+
+        private static int downloadPercent;
+
+        internal static string FormatDownloadProgress(int percent, int frame) {
+            const string frames = "/-\\|";
+            return string.Format(Lang.UpdateCheck_DownloadProgress, Math.Max(0, Math.Min(100, percent)), frames[frame % frames.Length]);
+        }
+
+        internal static void UpdateDownloadProgress(int percent) {
+            if (updateCheckMenuItem == null || updateCheckState != UpdateCheckState.Downloading) return;
+            downloadPercent = percent;
+            updateCheckMenuItem.Text = FormatDownloadProgress(downloadPercent, updateCheckDotsIndex);
         }
 
         private static string BuildUpdateStateText(
@@ -564,7 +599,7 @@ namespace LoxTools.UI.Tray {
 
             if (updateCheckDotsTimer == null) {
                 updateCheckDotsTimer = new System.Windows.Forms.Timer();
-                updateCheckDotsTimer.Interval = 600;
+                updateCheckDotsTimer.Interval = 300;
                 updateCheckDotsTimer.Tick += (s, e) => UpdateAnimatedDots();
             }
 
@@ -587,6 +622,11 @@ namespace LoxTools.UI.Tray {
                 return;
             }
 
+            if (updateCheckState == UpdateCheckState.Downloading) {
+                updateCheckMenuItem.Text = FormatDownloadProgress(downloadPercent, updateCheckDotsIndex);
+                updateCheckDotsIndex = (updateCheckDotsIndex + 1) % 4;
+                return;
+            }
             string dots = updateCheckDotsIndex == 0 ? "." : updateCheckDotsIndex == 1 ? ".." : "...";
             string formatText = string.IsNullOrWhiteSpace(updateCheckDotsFormat)
                 ? Lang.UpdateCheck_Checking_WithDots
@@ -673,11 +713,8 @@ namespace LoxTools.UI.Tray {
         }
 
         private static void TryOpenUpdateDownloadFolder() {
-            if (updateCheckState != UpdateCheckState.Downloading) {
-                return;
-            }
-
             string path = UpdateCheckService.GetTempRoot();
+            try { System.IO.Directory.CreateDirectory(path); } catch { return; }
             OpenFolderWithShell(path);
         }
 
@@ -687,6 +724,12 @@ namespace LoxTools.UI.Tray {
 			var instance = LoxToolsInstance ?? LoxToolsApplication.GetInstance();
 			instance?.ShowSettingsWindow(false);
 		}
+
+		public static void openTrayOnboarding() {
+			var instance = LoxToolsInstance ?? LoxToolsApplication.GetInstance();
+			instance?.ShowTrayOnboarding();
+		}
+
         public static void tryOpenConfig(string execConfigPath, bool showSelectionDialog) {
             if (execConfigPath != null) {
                 try {
@@ -695,7 +738,7 @@ namespace LoxTools.UI.Tray {
                     MessageBox.Show(ex.ToString());
                 }
             } else {
-                MessageBox.Show("Couldn't find Folder of Loxone Config");
+                MessageBox.Show(Lang.NoInstalledConfigVersionsFound);
             }
         }
         public static void tryOpenFile(string execConfigPath, bool showSelectionDialog) {
@@ -712,7 +755,7 @@ namespace LoxTools.UI.Tray {
                     MessageBox.Show(ex.ToString());
                 }
             } else {
-                MessageBox.Show("Couldn't find Folder of Loxone Config");
+                MessageBox.Show(Lang.NoInstalledConfigVersionsFound);
             }
         }
 
@@ -744,7 +787,7 @@ namespace LoxTools.UI.Tray {
                 if (loxoneAppPath != null) {
                     Process.Start(loxoneAppPath);
                 } else {
-                    MessageBox.Show("Loxone App nicht installiert.");
+                    MessageBox.Show(Lang.LoxoneAppNotInstalled);
                 }
             } catch (Exception ex) {
                 MessageBox.Show(ex.ToString());

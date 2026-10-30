@@ -17,6 +17,7 @@ namespace LoxTools.UpdateCheck {
             Directory.CreateDirectory(destinationFolder);
             string installerPath = Path.Combine(destinationFolder, UpdateSecurityPolicy.InstallerFileName);
 
+            bool created = false;
             try {
                 using (ZipArchive archive = ZipFile.OpenRead(archivePath)) {
                     if (archive.Entries.Count != 1) {
@@ -34,6 +35,7 @@ namespace LoxTools.UpdateCheck {
 
                     using (Stream input = entry.Open())
                     using (var output = new FileStream(installerPath, FileMode.CreateNew, FileAccess.Write, FileShare.None, BufferSize, useAsync: false)) {
+                        created = true;
                         var buffer = new byte[BufferSize];
                         long totalBytes = 0;
                         int bytesRead;
@@ -54,10 +56,10 @@ namespace LoxTools.UpdateCheck {
 
                 return installerPath;
             } catch (UpdateSecurityException) {
-                TryDelete(installerPath);
+                if (created) TryDelete(installerPath);
                 throw;
             } catch (Exception ex) {
-                TryDelete(installerPath);
+                if (created) TryDelete(installerPath);
                 throw new UpdateSecurityException(UpdateValidationFailure.Archive, "The update archive could not be validated.", ex);
             }
         }

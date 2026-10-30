@@ -1,0 +1,305 @@
+<Window x:Class="LoxTools.TrayOnboardingWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        mc:Ignorable="d"
+        Title="{Binding WindowTitle}"
+        Width="{DynamicResource OnboardingWindowWidth}"
+        Height="{DynamicResource OnboardingWindowHeight}"
+        ResizeMode="NoResize"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ShowInTaskbar="True"
+        ShowActivated="True"
+        WindowStartupLocation="CenterScreen"
+        FontFamily="{DynamicResource AppFontFamily}"
+        Foreground="{DynamicResource BrushPrimary}"
+        AutomationProperties.Name="{Binding WindowTitle}">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Themes/AppTheme.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid>
+        <Border Style="{StaticResource OnboardingWindowSurfaceStyle}"
+                Margin="{StaticResource OnboardingWindowSurfaceMargin}"
+                MouseLeftButtonDown="WindowSurface_MouseLeftButtonDown">
+            <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0">
+                <StackPanel HorizontalAlignment="Center"
+                            VerticalAlignment="Top"
+                            MaxWidth="{StaticResource OnboardingHeaderMaxWidth}">
+                    <TextBlock Text="{Binding WindowTitle}"
+                               Style="{StaticResource OnboardingEyebrowTextStyle}"/>
+                    <TextBlock Text="{Binding TitleText}"
+                               Style="{StaticResource OnboardingTitleTextStyle}"/>
+                    <TextBlock Text="{Binding DescriptionText}"
+                               Style="{StaticResource OnboardingBodyTextStyle}"
+                               TextAlignment="Center"
+                               Margin="{StaticResource OnboardingDescriptionMargin}"/>
+                </StackPanel>
+
+                <Button HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
+                        Style="{StaticResource OnboardingCloseButtonStyle}"
+                        Click="Close_Click"
+                        ToolTip="{Binding CloseText}"
+                        AutomationProperties.Name="{Binding CloseText}">
+                    <Path Data="{StaticResource CloseGeometry}"
+                          Width="{StaticResource OnboardingCloseIconSize}"
+                          Height="{StaticResource OnboardingCloseIconSize}"
+                          Stretch="Uniform"
+                          Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                          StrokeThickness="{StaticResource OnboardingCloseIconStroke}"/>
+                </Button>
+            </Grid>
+
+            <Border Grid.Row="2"
+                    Style="{StaticResource OnboardingVisualStyle}"
+                    AutomationProperties.Name="{Binding IllustrationDescription}">
+                <Canvas Width="{StaticResource OnboardingVisualInnerWidth}"
+                        Height="{StaticResource OnboardingVisualCanvasHeight}"
+                        ClipToBounds="True">
+                    <Ellipse Width="{StaticResource OnboardingAmbientGlowSize}"
+                             Height="{StaticResource OnboardingAmbientGlowSize}"
+                             Canvas.Left="{StaticResource OnboardingAmbientGlowLeft}"
+                             Canvas.Top="{StaticResource OnboardingAmbientGlowTop}"
+                             Fill="{DynamicResource OnboardingAmbientGlowBrush}"
+                             IsHitTestVisible="False"/>
+
+                    <Path Data="{StaticResource OnboardingWallpaperWaveGeometry}"
+                          Fill="{DynamicResource OnboardingWallpaperWaveBrush}"
+                          IsHitTestVisible="False"/>
+                    <Ellipse Width="{StaticResource OnboardingWallpaperGlowSize}"
+                             Height="{StaticResource OnboardingWallpaperGlowSize}"
+                             Canvas.Left="{StaticResource OnboardingWallpaperGlowLeft}"
+                             Canvas.Top="{StaticResource OnboardingWallpaperGlowTop}"
+                             Fill="{DynamicResource OnboardingWallpaperGlowBrush}"
+                             IsHitTestVisible="False"/>
+
+                    <Border Width="{StaticResource OnboardingFlyoutWidth}"
+                            Height="{StaticResource OnboardingFlyoutHeight}"
+                            Canvas.Left="{StaticResource OnboardingFlyoutLeft}"
+                            Canvas.Top="{StaticResource OnboardingFlyoutTop}"
+                            Style="{StaticResource OnboardingFlyoutStyle}">
+                        <Grid Margin="{StaticResource OnboardingFlyoutIconsMargin}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Border Grid.Column="0"
+                                    Style="{StaticResource OnboardingFlyoutAppIconStyle}">
+                                <Image Source="{Binding AppIcon}" Stretch="Uniform"/>
+                            </Border>
+                            <Border Grid.Column="1"
+                                    Style="{StaticResource OnboardingFlyoutSecondaryIconStyle}">
+                                <UniformGrid Rows="2" Columns="2">
+                                    <Ellipse Style="{StaticResource OnboardingSecondaryIconDotStyle}"/>
+                                    <Ellipse Style="{StaticResource OnboardingSecondaryIconDotStyle}"/>
+                                    <Ellipse Style="{StaticResource OnboardingSecondaryIconDotStyle}"/>
+                                    <Ellipse Style="{StaticResource OnboardingSecondaryIconDotStyle}"/>
+                                </UniformGrid>
+                            </Border>
+                        </Grid>
+                    </Border>
+
+                    <Path Data="{StaticResource OnboardingFlyoutPointerGeometry}"
+                          Canvas.Left="{StaticResource OnboardingFlyoutPointerLeft}"
+                          Canvas.Top="{StaticResource OnboardingFlyoutPointerTop}"
+                          Fill="{DynamicResource OnboardingFlyoutBrush}"/>
+
+                    <Border Width="{StaticResource OnboardingMarkerSize}"
+                            Height="{StaticResource OnboardingMarkerSize}"
+                            Canvas.Left="{StaticResource OnboardingStepTwoMarkerLeft}"
+                            Canvas.Top="{StaticResource OnboardingStepTwoMarkerTop}"
+                            Style="{StaticResource OnboardingMarkerStyle}">
+                        <TextBlock Text="2" Style="{StaticResource OnboardingMarkerTextStyle}"/>
+                    </Border>
+
+                    <Path Data="{StaticResource OnboardingDragPathGeometry}"
+                          Stroke="{DynamicResource OnboardingDragGuideBrush}"
+                          StrokeThickness="{StaticResource OnboardingDragGuideThickness}"
+                          StrokeDashArray="{StaticResource OnboardingDragGuideDashArray}"
+                          StrokeStartLineCap="Round"
+                          StrokeEndLineCap="Round"
+                          StrokeLineJoin="Round"
+                          Fill="Transparent"/>
+
+                    <Path Data="{StaticResource OnboardingDragArrowHeadGeometry}"
+                          Canvas.Left="{StaticResource OnboardingDragArrowHeadLeft}"
+                          Canvas.Top="{StaticResource OnboardingDragArrowHeadTop}"
+                          Fill="{DynamicResource OnboardingDragGuideBrush}"/>
+
+                    <Border Width="{StaticResource OnboardingTaskbarWidth}"
+                            Height="{StaticResource OnboardingTaskbarHeight}"
+                            Canvas.Left="{StaticResource OnboardingTaskbarLeft}"
+                            Canvas.Bottom="{StaticResource OnboardingTaskbarBottom}"
+                            Style="{StaticResource OnboardingTaskbarStyle}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Border Grid.ColumnSpan="2"
+                                    Style="{StaticResource OnboardingTaskbarHighlightStyle}"/>
+
+                            <StackPanel Grid.Column="1"
+                                        Orientation="Horizontal"
+                                        VerticalAlignment="Center"
+                                        Margin="{StaticResource OnboardingTaskbarItemsMargin}">
+                                <Border Style="{StaticResource OnboardingChevronHitStyle}"
+                                        Margin="{StaticResource OnboardingTaskbarItemMargin}">
+                                    <TextBlock Text="^"
+                                               Style="{StaticResource OnboardingTrayGlyphTextStyle}"/>
+                                </Border>
+                                <Grid Width="{StaticResource OnboardingDropSlotWidth}"
+                                      Height="{StaticResource OnboardingDropSlotHeight}"
+                                      Margin="{StaticResource OnboardingTaskbarItemMargin}">
+                                    <Rectangle Style="{StaticResource OnboardingDropSlotShapeStyle}"/>
+                                    <TextBlock Text="{Binding DropHereText}"
+                                               Style="{StaticResource OnboardingDropHereTextStyle}"/>
+                                </Grid>
+                                <Path Data="{StaticResource MonitorGeometry}"
+                                      Width="{StaticResource OnboardingTrayIconSize}"
+                                      Height="{StaticResource OnboardingTrayIconSize}"
+                                      Stretch="Uniform"
+                                      Stroke="{DynamicResource BrushSecondary}"
+                                      StrokeThickness="{StaticResource OnboardingTrayIconStroke}"
+                                      StrokeStartLineCap="Round"
+                                      StrokeEndLineCap="Round"
+                                      StrokeLineJoin="Round"
+                                      Margin="{StaticResource OnboardingTaskbarItemMargin}"/>
+                                <Path Data="{StaticResource VolumeGeometry}"
+                                      Width="{StaticResource OnboardingTrayIconSize}"
+                                      Height="{StaticResource OnboardingTrayIconSize}"
+                                      Stretch="Uniform"
+                                      Stroke="{DynamicResource BrushSecondary}"
+                                      StrokeThickness="{StaticResource OnboardingTrayIconStroke}"
+                                      StrokeStartLineCap="Round"
+                                      StrokeEndLineCap="Round"
+                                      StrokeLineJoin="Round"
+                                      Margin="{StaticResource OnboardingTaskbarItemMargin}"/>
+                                <StackPanel Margin="{StaticResource OnboardingClockMargin}"
+                                            VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding TaskbarClockText}"
+                                               Style="{StaticResource OnboardingClockTextStyle}"/>
+                                    <TextBlock Text="{Binding TaskbarDateText}"
+                                               Style="{StaticResource OnboardingClockTextStyle}"/>
+                                </StackPanel>
+                                <Path Data="{StaticResource BellGeometry}"
+                                      Width="{StaticResource OnboardingTrayIconSize}"
+                                      Height="{StaticResource OnboardingTrayIconSize}"
+                                      Stretch="Uniform"
+                                      Stroke="{DynamicResource BrushSecondary}"
+                                      StrokeThickness="{StaticResource OnboardingTrayIconStroke}"
+                                      StrokeStartLineCap="Round"
+                                      StrokeEndLineCap="Round"
+                                      StrokeLineJoin="Round"
+                                      Margin="{StaticResource OnboardingBellMargin}"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <Border Width="{StaticResource OnboardingMarkerSize}"
+                            Height="{StaticResource OnboardingMarkerSize}"
+                            Canvas.Left="{StaticResource OnboardingStepOneMarkerLeft}"
+                            Canvas.Top="{StaticResource OnboardingStepOneMarkerTop}"
+                            Style="{StaticResource OnboardingMarkerStyle}">
+                        <TextBlock Text="1" Style="{StaticResource OnboardingMarkerTextStyle}"/>
+                    </Border>
+                </Canvas>
+            </Border>
+
+            <Border Grid.Row="3"
+                    Style="{StaticResource OnboardingStepsContainerStyle}"
+                    Margin="{StaticResource OnboardingStepsMargin}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0"
+                          Margin="{StaticResource OnboardingStepRowPadding}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Border Style="{StaticResource OnboardingStepNumberStyle}">
+                            <TextBlock Text="1" Style="{StaticResource OnboardingStepNumberTextStyle}"/>
+                        </Border>
+                        <StackPanel Grid.Column="1" Margin="{StaticResource OnboardingStepTextMargin}">
+                            <TextBlock Text="{Binding StepOneTitle}" Style="{StaticResource OnboardingStepTitleStyle}"/>
+                            <TextBlock Text="{Binding StepOneDescription}" Style="{StaticResource OnboardingStepDescriptionStyle}"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <Border Grid.Row="1"
+                            Style="{StaticResource OnboardingStepDividerStyle}"/>
+
+                    <Grid Grid.Row="2"
+                          Margin="{StaticResource OnboardingStepRowPadding}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Border Style="{StaticResource OnboardingStepNumberStyle}">
+                            <TextBlock Text="2" Style="{StaticResource OnboardingStepNumberTextStyle}"/>
+                        </Border>
+                        <StackPanel Grid.Column="1" Margin="{StaticResource OnboardingStepTextMargin}">
+                            <TextBlock Text="{Binding StepTwoTitle}" Style="{StaticResource OnboardingStepTitleStyle}"/>
+                            <TextBlock Text="{Binding StepTwoDescription}" Style="{StaticResource OnboardingStepDescriptionStyle}"/>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <TextBlock Grid.Row="4"
+                       Text="{Binding ReopenHintText}"
+                       Style="{StaticResource OnboardingHintTextStyle}"
+                       Margin="{StaticResource OnboardingHintMargin}"/>
+
+            <Grid Grid.Row="5" Margin="{StaticResource OnboardingFooterMargin}">
+                <Button x:Name="DoneButton" HorizontalAlignment="Center"
+                        Content="{Binding DoneText}"
+                        Style="{StaticResource FooterAccentButtonStyle}"
+                        Click="Done_Click"
+                        IsDefault="True"/>
+            </Grid>
+            </Grid>
+        </Border>
+
+        <Grid Width="{StaticResource OnboardingHeaderIconSize}"
+              Height="{StaticResource OnboardingHeaderIconSize}"
+              HorizontalAlignment="Center"
+              VerticalAlignment="Top"
+              Panel.ZIndex="1"
+              Margin="{StaticResource OnboardingHeaderIconMargin}">
+            <Grid.Clip>
+                <RectangleGeometry Rect="{StaticResource OnboardingHeaderIconClipRect}"
+                                   RadiusX="{StaticResource OnboardingHeaderIconCornerRadius}"
+                                   RadiusY="{StaticResource OnboardingHeaderIconCornerRadius}"/>
+            </Grid.Clip>
+            <Image Source="{Binding AppIcon}"
+                   Stretch="UniformToFill"/>
+        </Grid>
+    </Grid>
+</Window>
